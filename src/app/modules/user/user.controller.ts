@@ -1,15 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import { UserService } from "./user.service";
-import { success } from "zod";
+import { sendResponse } from "../../utils/sendResponse";
 
 const createUser = async(req:Request, res: Response, next:NextFunction)=>{
     try {
         const payload = req.body;
     const user = await UserService.userCreate(payload)
-    res.status(201).json({
-        success:true,
+    sendResponse(res,{
+        success: true,
         message: "User created successfully",
-        data: user
+        data: user,
+        statusCode: res.statusCode,
     })
     } catch (error:any) {
         console.log(error);
@@ -22,12 +23,22 @@ const createUser = async(req:Request, res: Response, next:NextFunction)=>{
 }
 
 const getAllUser = async(req:Request,res:Response) =>{
-    const findAllUser = await UserService.findAllUser()
-    res.status(200).json({
+    try {
+        const findAllUser = await UserService.findAllUser()
+    sendResponse(res,{
         success: true,
-        message: "All user retrived",
-        data: findAllUser
+        message: "All users retrieved successfully",
+        data: findAllUser,
+        statusCode: res.statusCode,
     })
+    } catch (error) {
+        console.log(error);
+        res.status(400).json({
+            success: false,
+            message:"Something went wrong",
+            error
+        })
+    }
 }
 
 
