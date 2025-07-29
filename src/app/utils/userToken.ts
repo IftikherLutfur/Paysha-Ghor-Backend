@@ -27,7 +27,6 @@ export const createUserToken = (user: Partial<IUser>)=>{
         role: user.role
     }
     const accessToken = generateToken(JwtPayload,JWT_SECRET, "1d")
-    console.log(accessToken);
     return {accessToken};
 
 }
