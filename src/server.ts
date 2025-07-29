@@ -5,13 +5,13 @@ import { Server } from 'http'
 
 dotenv.config()
 
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 5000;
 
 let server: Server;
 
 const startServer = async () => {
   try {
-    await mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.hyx8zzc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`)
+    await mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.hyx8zzc.mongodb.net/payshaghor?retryWrites=true&w=majority&appName=Cluster0`)
     console.log('✅ Database Connected')
 
     server = app.listen(port, () => {
