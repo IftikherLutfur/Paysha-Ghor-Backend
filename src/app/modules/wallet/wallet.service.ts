@@ -1,7 +1,8 @@
 import { partial } from "zod/v4/core/util.cjs";
 import { User } from "../user/user.model";
-import { ITransaction, IWallet } from "./wallet.interface";
+import { IPaymentType, ITransaction, IWallet } from "./wallet.interface";
 import { Transaction, Wallet } from "./wallet.model";
+import { Role } from "../user/user.interface";
 
 const walletCreate = async (payload: Partial<IWallet>, userId: string) => {
     // 1 jon user er 2 ta wallet jate khulte na pare
@@ -33,12 +34,19 @@ const deposite = async (userId: string, amount: number) => {
     }
     wallet.balance = wallet.balance + amount;
     await wallet.save();
-    return wallet
+
+    const deposite = await Transaction.create({
+        type: IPaymentType.POPUP,
+        from: userId,
+        amount: amount
+    })
+
+    return deposite
 
 }
 
 // send money
-const sendMoney = async (payload: Partial<ITransaction>, userId) => {
+const sendMoney = async (payload: Partial<ITransaction>) => {
     const { from, to, amount } = payload;
 
     const sender = await User.findById(from);
@@ -57,7 +65,7 @@ const sendMoney = async (payload: Partial<ITransaction>, userId) => {
     }
 
     const recieverWallet = await Wallet.findOne({ userId: to })
-    if(!recieverWallet){
+    if (!recieverWallet) {
         throw new Error("Reciever wallet is not found")
     }
 
@@ -74,12 +82,99 @@ const sendMoney = async (payload: Partial<ITransaction>, userId) => {
     senderWallet.save();
     recieverWallet.save();
 
-    return {senderWallet,recieverWallet}
+    const transaction = await Transaction.create({
+        from: senderWallet,
+        to: recieverWallet,
+        amount: amount,
+        type: IPaymentType.SENDMONEY
+    })
+
+    return transaction
 
 }
+
+const withdrawByUser = async (payload: ITransaction) => {
+    const { from, amount } = payload;
+
+    const isValidUser = await User.findById(from);
+    if (!isValidUser) {
+        throw new Error("Unvalid user")
+    }
+
+    const cashOutUser = await Wallet.findOne({ userId: from });
+    if (!cashOutUser) {
+        throw new Error("This user does not exist")
+    }
+
+    if (typeof amount !== "number" || isNaN(amount)) {
+        throw new Error("Amount should be valid number")
+    }
+
+    cashOutUser.balance = cashOutUser.balance - amount;
+    cashOutUser.save();
+
+    const transaction = await Transaction.create({
+        from: from,
+        amount: amount,
+        type: IPaymentType.WITHDRAW
+    })
+
+    return transaction;
+
+}
+
+const cashInMoney = async (payload: Partial<ITransaction>, userEmail: string) => {
+    const { to, amount } = payload
+
+
+    const reciever = await Wallet.findOne({ userId: to })
+    if (!reciever) {
+        throw new Error("This user doesn't exist")
+    }
+    if (typeof amount !== "number" || isNaN(amount)) {
+        throw new Error("Amount should be valid number")
+    }
+    reciever.balance = reciever.balance + amount;
+    reciever.save()
+
+    const createTransaction = await Transaction.create({
+        to: reciever,
+        amount: amount,
+        type: IPaymentType.AGENT_CASHIN,
+        initiate: userEmail
+    })
+
+    return createTransaction;
+}
+
+const cashoutMoney = async (payload: Partial<ITransaction>, userEmail: string) => {
+    const { from, amount } = payload
+    const sender = await Wallet.findOne({ userId: from })
+    if (!sender) {
+        throw new Error("This user doesn't exist")
+    }
+    if (typeof amount !== "number" || isNaN(amount)) {
+        throw new Error("Amount should be valid number")
+    }
+    sender.balance = sender.balance - amount;
+    sender.save()
+
+    const createTransaction = await Transaction.create({
+        from: sender,
+        amount: amount,
+        type: IPaymentType.AGENT_CASHIN,
+        initiate: userEmail
+    })
+
+    return createTransaction;
+}
+
 
 export const WalletService = {
     walletCreate,
     deposite,
-    sendMoney
+    sendMoney,
+    withdrawByUser,
+    cashInMoney,
+    cashoutMoney
 }

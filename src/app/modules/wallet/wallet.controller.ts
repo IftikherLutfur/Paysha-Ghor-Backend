@@ -30,6 +30,7 @@ const depositeByUser = async(req:Request, res: Response)=>{
     try {
      const userId = req.user._id;
      const {amount} = req.body;
+     const payload = req.body
 
      if(!amount || amount <=0){
         throw new Error("A valid amount is required")
@@ -45,23 +46,13 @@ const depositeByUser = async(req:Request, res: Response)=>{
      })
 
     } catch (error) {
-        
+        console.log(error);
     }
 }
 
-// *1.Send money from a valid user who is exist on db at the user collection
-// *2.Recieved money a valid user, who is exist on db at the user collection
-// *3.This operation done by transaction collection
-// *4.To means who send and the sender's data will be stored by the sender id (to)
-// *5.By this operation wallet collection will be change, add or out from the user wallet.
-// *6.
-
-
-
 const sendMoney = async(req: Request, res:Response)=>{
   const payload = req.body;
-  const userId = req.user._id
-  const send = await WalletService.sendMoney(payload, userId)
+  const send = await WalletService.sendMoney(payload)
   sendResponse(res,{
     success: true,
     message: "Money send successfully",
@@ -70,8 +61,49 @@ const sendMoney = async(req: Request, res:Response)=>{
   })
 }
 
+const cashIn = async(req:Request, res:Response) =>{
+     const payload = req.body;
+     const userEmail = req.user._id;
+     const cashInByAgent = await WalletService.cashInMoney(payload, userEmail);
+     sendResponse(res,{
+        success:true,
+        message:"Cashin Successful",
+        statusCode: res.statusCode,
+        data: cashInByAgent
+     })
+}
+
+const cashout = async(req:Request, res:Response) =>{
+     const payload = req.body;
+     const userId = req.user._id;
+     const cashInByAgent = await WalletService.cashoutMoney(payload, userId);
+     sendResponse(res,{
+        success:true,
+        message:"Cashout Successful",
+        statusCode: res.statusCode,
+        data: cashInByAgent
+     })
+}
+
+const withdraw = async (req:Request, res:Response) =>{
+      const payload = req.body;
+      const withdraw = await WalletService.withdrawByUser(payload)
+      sendResponse(res,{
+        success: true,
+        message: "Successfully cashout",
+        statusCode: res.statusCode,
+        data: withdraw
+      })
+
+    }
+
+
+
 export const WalletController = {
     createWallet,
     depositeByUser,
-    sendMoney
+    sendMoney,
+    withdraw,
+    cashIn,
+    cashout
 }

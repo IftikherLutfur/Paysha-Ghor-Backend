@@ -1,0 +1,8 @@
+1. Create user (done)
+2. Login with jwt token generate (done)
+3. Create wallet (done)
+4. Add money by user (done)
+5. Send money from user to user (done)
+6. Withdraw by user (done)
+7. Cash-in from the agent (done)
+8. Cash-out from the agent (done)
