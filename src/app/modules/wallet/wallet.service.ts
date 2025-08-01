@@ -45,8 +45,8 @@ const deposite = async (userId: string, amount: number) => {
 
 }
 
-// send money
-const sendMoney = async (payload: Partial<ITransaction>) => {
+// send money from user to user
+const sendMoney = async (payload: Partial<ITransaction>, userId: string) => {
     const { from, to, amount } = payload;
 
     const sender = await User.findById(from);
@@ -86,14 +86,15 @@ const sendMoney = async (payload: Partial<ITransaction>) => {
         from: senderWallet,
         to: recieverWallet,
         amount: amount,
-        type: IPaymentType.SENDMONEY
+        type: IPaymentType.SENDMONEY,
+        initiate: userId
     })
 
     return transaction
 
 }
 
-const withdrawByUser = async (payload: ITransaction) => {
+const withdrawByUser = async (payload: Partial<ITransaction>, userId: string) => {
     const { from, amount } = payload;
 
     const isValidUser = await User.findById(from);
@@ -116,13 +117,16 @@ const withdrawByUser = async (payload: ITransaction) => {
     const transaction = await Transaction.create({
         from: from,
         amount: amount,
-        type: IPaymentType.WITHDRAW
+        type: IPaymentType.WITHDRAW,
+        initiate: userId
     })
 
     return transaction;
 
 }
 
+
+// cashin by agent
 const cashInMoney = async (payload: Partial<ITransaction>, userEmail: string) => {
     const { to, amount } = payload
 
@@ -147,6 +151,7 @@ const cashInMoney = async (payload: Partial<ITransaction>, userEmail: string) =>
     return createTransaction;
 }
 
+// cashout by agent
 const cashoutMoney = async (payload: Partial<ITransaction>, userEmail: string) => {
     const { from, amount } = payload
     const sender = await Wallet.findOne({ userId: from })
@@ -165,10 +170,27 @@ const cashoutMoney = async (payload: Partial<ITransaction>, userEmail: string) =
         type: IPaymentType.AGENT_CASHIN,
         initiate: userEmail
     })
-
     return createTransaction;
 }
 
+const getAllTransaction = async () => {
+    const transaction = await Transaction.find({});
+    return transaction;
+}
+
+// get Individual Wallet
+const getIndividualWallet = async (walletId: string) => {
+    const wallet = await Wallet.findOne({ userId: walletId })
+    return wallet;
+}
+
+// get individual transaction
+const getOwnTransaction = async (transActionId: string) => {
+    const getTransaction = await Transaction.findOne({
+        initiate: transActionId
+    })
+    return getTransaction;
+}
 
 export const WalletService = {
     walletCreate,
@@ -176,5 +198,8 @@ export const WalletService = {
     sendMoney,
     withdrawByUser,
     cashInMoney,
-    cashoutMoney
+    cashoutMoney,
+    getAllTransaction,
+    getIndividualWallet,
+    getOwnTransaction
 }

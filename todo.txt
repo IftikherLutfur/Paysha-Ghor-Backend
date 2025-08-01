@@ -6,3 +6,7 @@
 6. Withdraw by user (done)
 7. Cash-in from the agent (done)
 8. Cash-out from the agent (done)
+9. All user get for admin (done, yet to check) 
+10. All transaction get for admin (done, yet to check)
+11. Individual wallet get for user & agent (done)
+12.Individual transaction for everyone (todo)

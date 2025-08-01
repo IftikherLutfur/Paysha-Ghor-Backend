@@ -7,7 +7,7 @@ const createWallet = async (req: Request, res: Response, next: NextFunction) => 
     try {
         const payload = req.body;
         const userId = req.user?._id;
-        
+
         // Id'r formate thik ache kina ta check korlam
         // if (!mongoose.Types.ObjectId.isValid(payload.userId)) {
         //     throw new Error("Invalid userId format in body");
@@ -26,78 +26,112 @@ const createWallet = async (req: Request, res: Response, next: NextFunction) => 
 }
 
 // pop-up
-const depositeByUser = async(req:Request, res: Response)=>{
+const depositeByUser = async (req: Request, res: Response) => {
     try {
-     const userId = req.user._id;
-     const {amount} = req.body;
-     const payload = req.body
+        const userId = req.user._id;
+        const { amount } = req.body;
+        const payload = req.body
 
-     if(!amount || amount <=0){
-        throw new Error("A valid amount is required")
-     }
+        if (!amount || amount <= 0) {
+            throw new Error("A valid amount is required")
+        }
 
-     const popUp = await WalletService.deposite(userId as string, Number(amount))
+        const popUp = await WalletService.deposite(userId as string, Number(amount))
 
-     sendResponse(res,{
-        success: true,
-        message: "Money has been deposited",
-        statusCode: res.statusCode,
-        data: popUp
-     })
+        sendResponse(res, {
+            success: true,
+            message: "Money has been deposited",
+            statusCode: res.statusCode,
+            data: popUp
+        })
 
     } catch (error) {
         console.log(error);
     }
 }
 
-const sendMoney = async(req: Request, res:Response)=>{
-  const payload = req.body;
-  const send = await WalletService.sendMoney(payload)
-  sendResponse(res,{
-    success: true,
-    message: "Money send successfully",
-    statusCode: res.statusCode,
-    data: send
-  })
+const sendMoney = async (req: Request, res: Response) => {
+    const payload = req.body;
+    const userId = req.user._id;
+    const send = await WalletService.sendMoney(payload, userId)
+    sendResponse(res, {
+        success: true,
+        message: "Money send successfully",
+        statusCode: res.statusCode,
+        data: send
+    })
 }
 
-const cashIn = async(req:Request, res:Response) =>{
-     const payload = req.body;
-     const userEmail = req.user._id;
-     const cashInByAgent = await WalletService.cashInMoney(payload, userEmail);
-     sendResponse(res,{
-        success:true,
-        message:"Cashin Successful",
+const cashIn = async (req: Request, res: Response) => {
+    const payload = req.body;
+    const userEmail = req.user._id;
+    const cashInByAgent = await WalletService.cashInMoney(payload, userEmail);
+    sendResponse(res, {
+        success: true,
+        message: "Cashin Successful",
         statusCode: res.statusCode,
         data: cashInByAgent
-     })
+    })
 }
 
-const cashout = async(req:Request, res:Response) =>{
-     const payload = req.body;
-     const userId = req.user._id;
-     const cashInByAgent = await WalletService.cashoutMoney(payload, userId);
-     sendResponse(res,{
-        success:true,
-        message:"Cashout Successful",
+const cashout = async (req: Request, res: Response) => {
+    const payload = req.body;
+    const userId = req.user._id;
+    const cashInByAgent = await WalletService.cashoutMoney(payload, userId);
+    sendResponse(res, {
+        success: true,
+        message: "Cashout Successful",
         statusCode: res.statusCode,
         data: cashInByAgent
-     })
+    })
 }
 
-const withdraw = async (req:Request, res:Response) =>{
-      const payload = req.body;
-      const withdraw = await WalletService.withdrawByUser(payload)
-      sendResponse(res,{
+const withdraw = async (req: Request, res: Response) => {
+    const payload = req.body;
+    const userId = req.user._id;
+    const withdraw = await WalletService.withdrawByUser(payload, userId)
+    sendResponse(res, {
         success: true,
         message: "Successfully cashout",
         statusCode: res.statusCode,
         data: withdraw
-      })
+    })
 
-    }
+}
 
 
+const getAllTransaction = async(req:Request, res:Response)=>{
+    const transaction = await WalletService.getAllTransaction()
+    sendResponse(res,{
+        success:true,
+        message:"All transaction retrived successfully",
+        statusCode: res.statusCode,
+        data: transaction
+    })
+}
+
+const getIndividualWallet = async(req:Request, res:Response)=>{
+    const walletId = req.params.id;
+    const getIndividual = await WalletService.getIndividualWallet(walletId);
+    sendResponse(res,{
+        success:true,
+        message: "Find your walletttttttttttt",
+        statusCode: res.statusCode,
+        data: getIndividual
+    })
+}
+
+
+const getIndividualTransaction = async (req:Request, res:Response)=>{
+    const transActionId= req.params.id
+    const getYourOwnTransaction = await WalletService.getOwnTransaction(transActionId)
+    sendResponse(res,{
+        success:true,
+        message: "Find your transaction",
+        statusCode: res.statusCode,
+        data: getYourOwnTransaction
+    })
+}
 
 export const WalletController = {
     createWallet,
@@ -105,5 +139,8 @@ export const WalletController = {
     sendMoney,
     withdraw,
     cashIn,
-    cashout
-}
+    cashout,
+    getAllTransaction,
+    getIndividualWallet,
+    getIndividualTransaction
+};
