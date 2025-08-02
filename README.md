@@ -84,6 +84,7 @@ All routes are protected with JWT and role-based middleware.
 📄 Transaction Routes
 
 -**GET /api/wallet/transaction — Get all transactions (Admin only)**
+
 -**GET /api/wallet/transaction/:userId — Get transactions for specific user**
 
 ⚙️ Technologies Used
@@ -119,5 +120,7 @@ npm run dev
 
 🧠 Author
 **Iftikher Lutfur Abdullah**
+
 -**🧑‍💻 Junior Full Stack Developer**
+
 **📧 iftikherabdullah@gmail.com**
