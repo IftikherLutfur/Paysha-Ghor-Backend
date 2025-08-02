@@ -101,10 +101,8 @@ All routes are protected with JWT and role-based middleware.
 🧠 Role-based middleware
 
 🛠️ Project Setup
-bash
-Copy
-Edit
-# Clone the repo
+
+## Clone the repo
 git clone https://github.com/your-username/paysha-ghor-backend.git
 cd paysha-ghor-backend
 
@@ -123,4 +121,4 @@ npm run dev
 
 -**🧑‍💻 Junior Full Stack Developer**
 
-**📧 iftikherabdullah@gmail.com**
+**📧 iftikherlutfur@gmail.com**
