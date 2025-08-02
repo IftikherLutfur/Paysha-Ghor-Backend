@@ -1,6 +1,6 @@
 # 💸 Paysha Ghor - Digital Wallet API (Backend)
 
-A role-based digital wallet system built with **Node.js**, **Express.js**, and **MongoDB**, inspired by platforms like **bKash** or **Nagad**. This system supports `user`, `agent`, and `admin` roles with secure authentication and modular financial transaction logic.
+A role-based digital wallet system built with **Node.js**, **Express.js**, and **MongoDB**. This system supports `user`, `agent`, and `admin` roles with secure authentication and modular financial transaction logic.
 
 ---
 
