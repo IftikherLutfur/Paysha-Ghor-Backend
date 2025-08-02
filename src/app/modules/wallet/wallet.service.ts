@@ -1,8 +1,7 @@
-import { partial } from "zod/v4/core/util.cjs";
+import mongoose from "mongoose";
 import { User } from "../user/user.model";
-import { IPaymentType, ITransaction, IWallet } from "./wallet.interface";
+import { IPaymentType, ITransaction, IWallet, Wallet_Status } from "./wallet.interface";
 import { Transaction, Wallet } from "./wallet.model";
-import { Role } from "../user/user.interface";
 
 const walletCreate = async (payload: Partial<IWallet>, userId: string) => {
     // 1 jon user er 2 ta wallet jate khulte na pare
@@ -28,6 +27,9 @@ const walletCreate = async (payload: Partial<IWallet>, userId: string) => {
 // pop-up
 const deposite = async (userId: string, amount: number) => {
     const wallet = await Wallet.findOne({ userId })
+    if (wallet?.walletStatus === Wallet_Status.BLOCK) {
+        throw new Error("Your wallet is block")
+    }
 
     if (!wallet) {
         throw new Error("Wallet not found")
@@ -47,9 +49,11 @@ const deposite = async (userId: string, amount: number) => {
 
 // send money from user to user
 const sendMoney = async (payload: Partial<ITransaction>, userId: string) => {
-    const { from, to, amount } = payload;
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    const sender = await User.findById(from);
+    const { to, amount } = payload;
+    const sender = await User.findById(userId);
     if (!sender) {
         throw new Error("Sender does not exist")
     }
@@ -58,13 +62,20 @@ const sendMoney = async (payload: Partial<ITransaction>, userId: string) => {
     if (!reciver) {
         throw new Error("Reciever does not exist")
     }
-
-    const senderWallet = await Wallet.findOne({ userId: from })
+    // check sender wallet is exist or not
+    const senderWallet = await Wallet.findOne({ userId: userId }).session(session);
+    if (senderWallet?.walletStatus === Wallet_Status.BLOCK) {
+        throw new Error("Your wallet is block")
+    }
     if (!senderWallet) {
         throw new Error("Sender wallet is not found")
     }
 
-    const recieverWallet = await Wallet.findOne({ userId: to })
+    // check receiver wallet is exist or not
+    const recieverWallet = await Wallet.findOne({ userId: to }).session(session);
+    if (recieverWallet?.walletStatus === Wallet_Status.BLOCK) {
+        throw new Error("Reciver wallet is block")
+    }
     if (!recieverWallet) {
         throw new Error("Reciever wallet is not found")
     }
@@ -76,21 +87,27 @@ const sendMoney = async (payload: Partial<ITransaction>, userId: string) => {
         throw new Error("Amount should be a valid number");
     }
 
+    if (senderWallet.balance < amount) {
+        throw new Error("Your wallet has not enough money to send")
+    }
+
     senderWallet.balance = senderWallet.balance - amount;
     recieverWallet.balance += amount;
 
-    senderWallet.save();
-    recieverWallet.save();
+    await senderWallet.save({session});
+    await recieverWallet.save({session});
 
-    const transaction = await Transaction.create({
-        from: senderWallet,
+    const transaction = await Transaction.create([{
+        from: userId,
         to: recieverWallet,
         amount: amount,
         type: IPaymentType.SENDMONEY,
         initiate: userId
-    })
-
+    }], { session });
+ await session.commitTransaction();
+    session.endSession();
     return transaction
+
 
 }
 
@@ -105,6 +122,10 @@ const withdrawByUser = async (payload: Partial<ITransaction>, userId: string) =>
     const cashOutUser = await Wallet.findOne({ userId: from });
     if (!cashOutUser) {
         throw new Error("This user does not exist")
+    }
+
+    if (cashOutUser?.walletStatus === Wallet_Status.BLOCK) {
+        throw new Error("Wallet is block")
     }
 
     if (typeof amount !== "number" || isNaN(amount)) {
@@ -135,6 +156,9 @@ const cashInMoney = async (payload: Partial<ITransaction>, userEmail: string) =>
     if (!reciever) {
         throw new Error("This user doesn't exist")
     }
+    if (reciever?.walletStatus === Wallet_Status.BLOCK) {
+        throw new Error("This wallet is block")
+    }
     if (typeof amount !== "number" || isNaN(amount)) {
         throw new Error("Amount should be valid number")
     }
@@ -157,6 +181,9 @@ const cashoutMoney = async (payload: Partial<ITransaction>, userEmail: string) =
     const sender = await Wallet.findOne({ userId: from })
     if (!sender) {
         throw new Error("This user doesn't exist")
+    }
+    if (sender?.walletStatus === Wallet_Status.BLOCK) {
+        throw new Error("This wallet is block")
     }
     if (typeof amount !== "number" || isNaN(amount)) {
         throw new Error("Amount should be valid number")
@@ -186,11 +213,26 @@ const getIndividualWallet = async (walletId: string) => {
 
 // get individual transaction
 const getOwnTransaction = async (transActionId: string) => {
-    const getTransaction = await Transaction.findOne({
+    const getTransaction = await Transaction.find({
         initiate: transActionId
     })
     return getTransaction;
 }
+
+const changeWalletStatus = async (walletId: string, payload: IWallet,) => {
+    const existingWallet = await Wallet.findOne({ _id: walletId });
+    if (!existingWallet) {
+        throw new Error("Wallet not found!");
+    }
+
+    const updatedWallet = await Wallet.findOneAndUpdate(
+        { _id: walletId },
+        { $set: { walletStatus: payload.walletStatus } },
+        { new: true }
+    );
+
+    return updatedWallet;
+};
 
 export const WalletService = {
     walletCreate,
@@ -201,5 +243,6 @@ export const WalletService = {
     cashoutMoney,
     getAllTransaction,
     getIndividualWallet,
-    getOwnTransaction
+    getOwnTransaction,
+    changeWalletStatus
 }

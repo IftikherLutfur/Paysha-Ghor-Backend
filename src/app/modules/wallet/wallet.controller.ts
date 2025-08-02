@@ -100,21 +100,21 @@ const withdraw = async (req: Request, res: Response) => {
 }
 
 
-const getAllTransaction = async(req:Request, res:Response)=>{
+const getAllTransaction = async (req: Request, res: Response) => {
     const transaction = await WalletService.getAllTransaction()
-    sendResponse(res,{
-        success:true,
-        message:"All transaction retrived successfully",
+    sendResponse(res, {
+        success: true,
+        message: "All transaction retrived successfully",
         statusCode: res.statusCode,
         data: transaction
     })
 }
 
-const getIndividualWallet = async(req:Request, res:Response)=>{
+const getIndividualWallet = async (req: Request, res: Response) => {
     const walletId = req.params.id;
     const getIndividual = await WalletService.getIndividualWallet(walletId);
-    sendResponse(res,{
-        success:true,
+    sendResponse(res, {
+        success: true,
         message: "Find your walletttttttttttt",
         statusCode: res.statusCode,
         data: getIndividual
@@ -122,16 +122,39 @@ const getIndividualWallet = async(req:Request, res:Response)=>{
 }
 
 
-const getIndividualTransaction = async (req:Request, res:Response)=>{
-    const transActionId= req.params.id
+const getIndividualTransaction = async (req: Request, res: Response) => {
+    const transActionId = req.params.id
     const getYourOwnTransaction = await WalletService.getOwnTransaction(transActionId)
-    sendResponse(res,{
-        success:true,
+    sendResponse(res, {
+        success: true,
         message: "Find your transaction",
         statusCode: res.statusCode,
         data: getYourOwnTransaction
     })
 }
+
+const changeWalletStatus = async (req: Request, res: Response) => {
+    try {
+        const walletId = req.params.id;
+        const payload = req.body;
+        const changeStatus = await WalletService.changeWalletStatus(walletId, payload);
+
+        sendResponse(res, {
+            success: true,
+            message: "Wallet status has been changed",
+            statusCode: 200,
+            data: changeStatus,
+        });
+    } catch (error) {
+        sendResponse(res, {
+            success: false,
+            message: "Something went wrong",
+            statusCode: 404,
+            data: null,
+        });
+    }
+};
+
 
 export const WalletController = {
     createWallet,
@@ -142,5 +165,6 @@ export const WalletController = {
     cashout,
     getAllTransaction,
     getIndividualWallet,
-    getIndividualTransaction
+    getIndividualTransaction,
+    changeWalletStatus
 };

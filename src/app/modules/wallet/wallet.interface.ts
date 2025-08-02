@@ -5,15 +5,17 @@ export enum IType {
     AGENT="AGENT",
 }
 
+export enum Wallet_Status{
+    ACTIVE="ACTIVE",
+    BLOCK= "BLOCK"
+}
+
 export interface IWallet {
     id?: Types.ObjectId;
     userId: Types.ObjectId;
     balance: number;
-    isBlocked?:boolean;
+    walletStatus: Wallet_Status;
     walletType?:IType;
-    toalSent?:number;
-    totalWithdraw?: number;
-    totalRecieved?: number;
     commissionEarned?: number;
 }
 

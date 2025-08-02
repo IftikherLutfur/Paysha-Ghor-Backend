@@ -6,10 +6,17 @@ export enum Role {
     AGENT="AGENT"
 }
 
+export enum UserStatus{
+    APPROVED = "APPROVED",
+    PENDING = "PENDING",
+    SUSPEND = "SUSPEND"
+}
+
 export interface IUser{
     _id: Types.ObjectId;
     name?:string;
     email:string;
     password:string;
-    role: Role
+    role: Role,
+    userStatus?:UserStatus;
 }

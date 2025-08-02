@@ -1,15 +1,11 @@
 import { model, Schema } from "mongoose";
-import { IPaymentType, ITransaction, IType, IWallet } from "./wallet.interface";
-import { required } from "zod/v4/core/util.cjs";
+import { IPaymentType, ITransaction, IType, IWallet, Wallet_Status } from "./wallet.interface";
 
 const walletSchema = new Schema<IWallet>({
     userId: { type: Schema.Types.ObjectId, required: true, ref: "User" },
     balance: { type: Number, default: 50 },
+    walletStatus: { type: String, enum: Object.values(Wallet_Status), default: Wallet_Status.ACTIVE},
     walletType: { type: String, enum: Object.values(IType), default: IType.USER },
-    toalSent: { type: Number },
-    totalWithdraw: { type: Number },
-    totalRecieved: { type: Number },
-    commissionEarned: { type: Number },
 }, {
     timestamps: true,
     versionKey: false
@@ -21,7 +17,12 @@ const transactionSchema = new Schema<ITransaction>({
     amount: { type: Number, required: true },
     type: { type: String, enum: Object.values(IPaymentType), required: true },
     initiate: { type: Schema.Types.ObjectId },
-})
+},
+    {
+        timestamps: true,
+        versionKey: false
+    }
+)
 
 export const Wallet = model<IWallet>("Wallet", walletSchema)
 

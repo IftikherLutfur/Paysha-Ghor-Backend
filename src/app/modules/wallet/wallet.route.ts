@@ -14,5 +14,6 @@ wallet.post("/cash-out", checkAuth(Role.AGENT), WalletController.cashout)
 wallet.get("/transaction", checkAuth(Role.ADMIN),WalletController.getAllTransaction)
 wallet.get("/:id", checkAuth(Role.AGENT, Role.USER), WalletController.getIndividualWallet);
 wallet.get("/transaction/:id", checkAuth(Role.AGENT, Role.USER), WalletController.getIndividualTransaction);
+wallet.patch("/:id", checkAuth(Role.ADMIN), WalletController.changeWalletStatus)
 
 export const walletRoute = wallet;

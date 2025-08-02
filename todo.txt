@@ -9,4 +9,15 @@
 9. All user get for admin (done, yet to check) 
 10. All transaction get for admin (done, yet to check)
 11. Individual wallet get for user & agent (done)
-12.Individual transaction for everyone (todo)
+12.Individual transaction for everyone (done)
+
+
+Feature	Status
+🛑 Admin: Block/Unblock wallets	✅ done  
+🛠️ Admin: Approve/suspend agents ✅ done
+💸 Transaction fee/agent commission (Optional)	❌ Not done
+ Validations (e.g., insufficient balance, blocked wallets)	✅ done
+🧠 Atomic operations (e.g., consistency between wallet balance and transaction)	⚠️ Not confirmed ✅ done
+📜 Authorization protection on routes confirmed✅
+🧾 Transaction status system (pending → completed etc.)	❌ Optional but not done
+📦 Proper code architecture (modular folders)	⚠️ Not confirmed
