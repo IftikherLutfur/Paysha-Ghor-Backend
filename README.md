@@ -1,88 +1,124 @@
 # 💸 Paysha Ghor - Digital Wallet API (Backend)
 
-A role-based digital wallet system built with **Node.js**, **Express.js**, and **MongoDB**. This system supports `user`, `agent`, and `admin` roles with secure authentication and modular financial transaction logic.
+A role-based digital wallet backend built with **Node.js**, **Express.js**, and **MongoDB**. This API supports `User`, `Agent`, and `Admin` roles with secure JWT authentication, transaction management, and modular structure.
 
 ---
 
 ## 🚀 Features
 
-✅ JWT-based authentication with role-based access  
-✅ Secure password hashing with bcrypt  
-✅ Automatic wallet creation at registration (initial balance: ৳50)  
-✅ Role-based route protection  
-✅ Full wallet & transaction logic  
-✅ Clean, modular project structure
+- ✅ Role-based JWT Authentication  
+- ✅ Secure Password Hashing with **bcrypt**  
+- ✅ Auto Wallet Creation with ৳50 Initial Balance  
+- ✅ Deposit, Send, Withdraw, Cash-in, and Cash-out Features  
+- ✅ Admin Panel for User & Wallet Management  
+- ✅ Modular MVC Project Structure
 
 ---
 
 ## 👥 User Roles and Permissions
 
-| Role   | Permissions |
-|--------|-------------|
-| **User**  | Deposit money, send money, withdraw, view own wallet & transactions |
-| **Agent** | Cash-in (add money to user), cash-out (withdraw from user), view wallet |
-| **Admin** | View all users, agents, wallets, transactions; block/unblock wallets; approve/suspend agents |
+| Role     | Permissions                                                                 |
+|----------|------------------------------------------------------------------------------|
+| 👤 **User**   | Deposit, Send money, Withdraw, View own wallet & transactions             |
+| 🧑‍💼 **Agent**  | Cash-in to user, Cash-out from user, View own wallet                     |
+| 🛡️ **Admin**   | View all users/agents/wallets/transactions, Approve/Suspend/Block users  |
 
 ---
 
 ## 🔐 Authentication & Authorization
 
-- **Login:** `POST /api/auth/login`
-- **Logout:** `POST /api/auth/logout`
-- All routes are protected via JWT and role-based middleware
+All routes are protected with JWT and role-based middleware.
 
----
+### 🔑 Auth Routes
 
-## 🌐 API Endpoints
+**POST /api/auth/login` — Login**  
+ 
+ `{"email": "iftikher@gmail.com",
+    "password": "1234Abdullah$$%%"}`
+**POST /api/auth/logout — Logout**
 
-> **Base URL:** `http://localhost:5000/`
+📦 API Endpoints
+🟢 Base URL: http://localhost:5000/
 
-### 🧑‍💼 User
+## 👤 User Routes
 
-- `POST /api/user/` — Register a new user
+**POST /api/user — Register a new user**
 
-### 🔐 Auth
+`{"name": "Shakib",
+  "email": "shakib@gmail.com",
+  "password": "Abcd@1234",
+  "role": "USER" | "AGENT"}`
 
-- `POST /api/auth/login` — User login  
-- `POST /api/auth/logout` — User logout  
+**GET /api/user — Get all users (Admin only)**
 
-### 💳 Wallet
+**PATCH /api/user/agent-approve/:userId — Approve/Suspend an agent**
 
-- `GET /api/wallet/:id` — Get wallet by ID  
-- `POST /api/wallet/deposit` — Add money (by user)  
-- `POST /api/wallet/sendMoney` — Send money (user to user)  
-- `POST /api/wallet/withdraw` — Withdraw money (by user)  
-- `POST /api/wallet/cash-in` — Cash-in (by agent)  
-- `POST /api/wallet/cash-out` — Cash-out (by agent)  
-- `GET /api/wallet/transaction` — Get all transactions (admin only)  
-- `GET /api/wallet/transaction/:id` — Get individual transaction  
+`{ "userStatus": "PENDING" | "APPROVED" | "SUSPEND"}`
 
----
+## 💳 Wallet Routes
 
-## 📦 Technologies Used
+**GET /api/wallet/:userId — Get individually wallet by user ID**
 
-- Node.js
-- Express.js
-- MongoDB with Mongoose
-- bcrypt for password hashing
-- JSON Web Token (JWT) for authentication
-- Role-based middleware for authorization
+**GET /api/wallet/ — Get all wallet only for admin**
 
----
+**POST /api/wallet/deposit — Deposit money (by user)**
 
-## ⚙️ Project Setup
+`{"from": "userId","amount": 20}`
 
-```bash
-# Clone the repository
+**POST /api/wallet/sendMoney — Send money (user to user)**
+
+`{"to": "receiverUserId","amount": 150}`
+
+**POST /api/wallet/withdraw — Withdraw money (user)**
+
+`{"amount": 1000}`
+
+**POST /api/wallet/cash-in — Agent adds money to user**
+
+`{"to": "userId", "amount": 150}`
+
+**POST /api/wallet/cash-out — Agent withdraws from user**
+
+`{"from": "userId","amount": 200}`
+
+📄 Transaction Routes
+
+-**GET /api/wallet/transaction — Get all transactions (Admin only)**
+
+-**GET /api/wallet/transaction/:userId — Get transactions for specific user**
+
+⚙️ Technologies Used
+🟨 Node.js
+
+⚙️ Express.js
+
+🍃 MongoDB + Mongoose
+
+🔒 bcrypt for hashing passwords
+
+🛡️ JWT for authentication
+
+🧠 Role-based middleware
+
+🛠️ Project Setup
+
+## Clone the repo
 git clone https://github.com/your-username/paysha-ghor-backend.git
 cd paysha-ghor-backend
 
-# Install dependencies
+## Install dependencies
 npm install
 
-# Environment setup
+## Create .env file
 cp .env.example .env
-# Set your MongoDB URI, JWT_SECRET, etc. in the .env file
+## Set your MongoDB URI, JWT_SECRET, etc.
 
-# Run the development server
+## Run the server
 npm run dev
+
+🧠 Author
+**Iftikher Lutfur Abdullah**
+
+-**🧑‍💻 Junior Full Stack Developer**
+
+**📧 iftikherlutfur@gmail.com**
