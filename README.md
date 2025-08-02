@@ -31,19 +31,20 @@ All routes are protected with JWT and role-based middleware.
 
 ### 🔑 Auth Routes
 
-- `POST /api/auth/login` — Login  
+**POST /api/auth/login` — Login**  
  
   {
     "email": "iftikher@gmail.com",
     "password": "1234Abdullah$$%%"
   }
-POST /api/auth/logout — Logout
+**POST /api/auth/logout — Logout**
 
 📦 API Endpoints
 🟢 Base URL: http://localhost:5000/
 
-👤 User Routes
-POST /api/user — Register a new user
+## 👤 User Routes
+
+**POST /api/user — Register a new user**
 
 {
   "name": "Shakib",
@@ -55,20 +56,21 @@ POST /api/user — Register a new user
   "role": "USER" | "AGENT"
 }
 
-GET /api/user — Get all users (Admin only)
+**GET /api/user — Get all users (Admin only)**
 
-PATCH /api/user/agent-approve/:userId — Approve/Suspend an agent
+**PATCH /api/user/agent-approve/:userId — Approve/Suspend an agent**
 
 {
   "userStatus": "PENDING" | "APPROVED" | "SUSPEND"
 }
 
-💳 Wallet Routes
-GET /api/wallet/:walletId — Get wallet by wallet ID
+## 💳 Wallet Routes
 
-GET /api/wallet/user/:userId — Get wallet by user ID
+**GET /api/wallet/:walletId — Get wallet by wallet ID**
 
-POST /api/wallet/deposit — Deposit money (by user)
+**GET /api/wallet/user/:userId — Get wallet by user ID**
+
+**POST /api/wallet/deposit — Deposit money (by user)**
 
 {
   "from": "userId",
@@ -76,7 +78,7 @@ POST /api/wallet/deposit — Deposit money (by user)
   "amount": 20
 }
 
-POST /api/wallet/sendMoney — Send money (user to user)
+**POST /api/wallet/sendMoney — Send money (user to user)**
 
 {
   "to": "receiverUserId",
@@ -84,19 +86,19 @@ POST /api/wallet/sendMoney — Send money (user to user)
   "amount": 150
 }
 
-POST /api/wallet/withdraw — Withdraw money (user)
+**POST /api/wallet/withdraw — Withdraw money (user)**
 
 {
   "amount": 1000
 }
-POST /api/wallet/cash-in — Agent adds money to user
+**POST /api/wallet/cash-in — Agent adds money to user**
 
 {
   "to": "userId",
   
   "amount": 15
 }
-POST /api/wallet/cash-out — Agent withdraws from user
+**POST /api/wallet/cash-out — Agent withdraws from user**
 
 {
   "from": "userId",
@@ -104,10 +106,9 @@ POST /api/wallet/cash-out — Agent withdraws from user
 }
 📄 Transaction Routes
 
-GET /api/wallet/transaction — Get all transactions (Admin only)
+**GET /api/wallet/transaction — Get all transactions (Admin only)**
 
-
-GET /api/wallet/transaction/:userId — Get transactions for specific user
+**GET /api/wallet/transaction/:userId — Get transactions for specific user**
 
 ⚙️ Technologies Used
 🟨 Node.js
@@ -139,13 +140,10 @@ cp .env.example .env
 
 # Run the server
 npm run dev
-🧪 Sample Environment Variables
 
-PORT=5000
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/payshaghor
-JWT_SECRET=yourSecretKey
-JWT_EXPIRES_IN=7d
 🧠 Author
 Iftikher Lutfur Abdullah
+
 🧑‍💻 Junior Full Stack Developer
+
 📧 iftikherabdullah@gmail.com
