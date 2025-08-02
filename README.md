@@ -83,6 +83,7 @@ POST /api/wallet/sendMoney — Send money (user to user)
   
   "amount": 150
 }
+
 POST /api/wallet/withdraw — Withdraw money (user)
 
 {
@@ -102,7 +103,9 @@ POST /api/wallet/cash-out — Agent withdraws from user
   "amount": 200
 }
 📄 Transaction Routes
+
 GET /api/wallet/transaction — Get all transactions (Admin only)
+
 
 GET /api/wallet/transaction/:userId — Get transactions for specific user
 
@@ -145,4 +148,4 @@ JWT_EXPIRES_IN=7d
 🧠 Author
 Iftikher Lutfur Abdullah
 🧑‍💻 Junior Full Stack Developer
-🌐 LinkedIn • 📧 iftikherabdullah@gmail.com
+📧 iftikherabdullah@gmail.com
