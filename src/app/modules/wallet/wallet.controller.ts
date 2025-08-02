@@ -3,28 +3,27 @@ import { sendResponse } from "../../utils/sendResponse";
 import { WalletService } from "./wallet.service";
 
 
-const createWallet = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-        const payload = req.body;
-        const userId = req.user?._id;
+// const createWallet = async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//         const payload = req.body;
+//         const userId = req.user?._id;
 
-        // Id'r formate thik ache kina ta check korlam
-        // if (!mongoose.Types.ObjectId.isValid(payload.userId)) {
-        //     throw new Error("Invalid userId format in body");
-        // }
-        const walletCreate = (await WalletService.walletCreate(payload, userId as string));
-        sendResponse(res, {
-            success: true,
-            message: "Wallet created successfully",
-            statusCode: res.statusCode,
-            data: walletCreate
-        })
-    } catch (error) {
-        next(error)
-        console.log(error);
-    }
-}
-
+//         // Id'r formate thik ache kina ta check korlam
+//         // if (!mongoose.Types.ObjectId.isValid(payload.userId)) {
+//         //     throw new Error("Invalid userId format in body");
+//         // }
+//         const walletCreate = (await WalletService.walletCreate(payload, userId as string));
+//         sendResponse(res, {
+//             success: true,
+//             message: "Wallet created successfully",
+//             statusCode: res.statusCode,
+//             data: walletCreate
+//         })
+//     } catch (error) {
+//         next(error)
+//         console.log(error);
+//     }
+// }
 // pop-up
 const depositeByUser = async (req: Request, res: Response) => {
     try {
@@ -99,7 +98,6 @@ const withdraw = async (req: Request, res: Response) => {
 
 }
 
-
 const getAllTransaction = async (req: Request, res: Response) => {
     const transaction = await WalletService.getAllTransaction()
     sendResponse(res, {
@@ -120,7 +118,6 @@ const getIndividualWallet = async (req: Request, res: Response) => {
         data: getIndividual
     })
 }
-
 
 const getIndividualTransaction = async (req: Request, res: Response) => {
     const transActionId = req.params.id
@@ -157,7 +154,7 @@ const changeWalletStatus = async (req: Request, res: Response) => {
 
 
 export const WalletController = {
-    createWallet,
+    // createWallet,
     depositeByUser,
     sendMoney,
     withdraw,

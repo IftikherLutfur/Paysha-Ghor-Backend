@@ -2,6 +2,11 @@ import { NextFunction, Request, Response } from "express";
 import { UserService } from "./user.service";
 import { sendResponse } from "../../utils/sendResponse";
 
+
+
+
+
+
 const createUser = async(req:Request, res: Response, next:NextFunction)=>{
     try {
         const payload = req.body;
@@ -21,6 +26,10 @@ const createUser = async(req:Request, res: Response, next:NextFunction)=>{
         })
     }
 }
+
+
+
+
 
 const getAllUser = async(req:Request,res:Response) =>{
     try {
