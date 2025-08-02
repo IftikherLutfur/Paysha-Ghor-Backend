@@ -62,17 +62,21 @@ const sendMoney = catchAsync(async (req: Request, res: Response) => {
     })
 })
 
+// cashin by agent
 const cashIn = catchAsync(async (req: Request, res: Response) => {
-    const payload = req.body;
-    const userId = req.user._id;
-    const cashInByAgent = await WalletService.cashInMoney(payload, userId);
-    sendResponse(res, {
-        success: true,
-        message: "Cashin Successful",
-        statusCode: res.statusCode,
-        data: cashInByAgent
-    })
-})
+  const payload = req.body;
+  const userId = req.user._id;
+
+  const result = await WalletService.cashInMoney(payload, userId);
+
+  sendResponse(res, {
+    success: true,
+    message: "Cashin Successful",
+    data: result,
+    statusCode: res.statusCode
+  });
+});
+
 
 const cashout = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
@@ -89,15 +93,17 @@ const cashout = catchAsync(async (req: Request, res: Response) => {
 const withdraw = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
     const userId = req.user._id;
-    const withdraw = await WalletService.withdrawByUser(payload, userId)
+
+    const withdraw = await WalletService.withdrawByUser(payload.amount, userId); // ✅ only pass amount and userId
+
     sendResponse(res, {
         success: true,
         message: "Successfully cashout",
         statusCode: res.statusCode,
         data: withdraw
-    })
+    });
+});
 
-})
 
 const getAllTransaction = catchAsync(async (req: Request, res: Response) => {
     const transaction = await WalletService.getAllTransaction()

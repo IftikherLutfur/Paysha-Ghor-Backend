@@ -22,9 +22,7 @@ app.use("/api/user", user_route_1.userRoute);
 app.use("/api/auth", auth_route_1.authRouter);
 app.use("/api/wallet", wallet_route_1.walletRoute);
 app.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.status(200).json({
-        message: "The payshaghor backend is running"
-    });
+    res.send("Welcome to Poysha Ghor API");
 }));
 app.use((err, req, res, next) => {
     console.error("Global Error:", err);

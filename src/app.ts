@@ -1,18 +1,17 @@
-import express, { Request, Response } from "express"
+import express, { Application, Request, Response } from "express"
 import { userRoute } from "./app/modules/user/user.route"
 import { authRouter } from "./app/modules/auth/auth.route"
 import { walletRoute } from "./app/modules/wallet/wallet.route"
-const app = express()
+const app: Application = express()
 
 app.use(express.json())
-app.use("api/user", userRoute)
-app.use("api/auth", authRouter)
-app.use("api/wallet", walletRoute)
+app.use("/api/user", userRoute)
+app.use("/api/auth", authRouter)
+app.use("/api/wallet", walletRoute)
 
-app.get("/", async(req:Request, res: Response)=>{
-    res.status(200).json({
-        message:"The payshaghor backend is running"
-    })
+app.get("/", async (req: Request, res: Response) => {
+  res.send("Welcome to Poysha Ghor API")
+
 })
 
 app.use((err: any, req: Request, res: Response, next: express.NextFunction) => {

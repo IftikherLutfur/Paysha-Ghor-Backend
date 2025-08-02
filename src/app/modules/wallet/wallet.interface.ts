@@ -33,5 +33,5 @@ export interface ITransaction {
     to?: Types.ObjectId;
     amount?:number;
     type?:IPaymentType;
-    initiate?: Types.ObjectId; // this is for agent
+    initiate?: Types.ObjectId;
 }

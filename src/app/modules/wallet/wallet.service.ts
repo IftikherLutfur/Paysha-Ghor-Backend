@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import { User } from "../user/user.model";
-import { IPaymentType, ITransaction, IWallet, Wallet_Status } from "./wallet.interface";
+import { IPaymentType, ITransaction, IType, IWallet, Wallet_Status } from "./wallet.interface";
 import { Transaction, Wallet } from "./wallet.model";
+import { Role, UserStatus } from "../user/user.interface";
 
 const walletCreate = async (payload: Partial<IWallet>, userId: string) => {
     // 1 jon user er 2 ta wallet jate khulte na pare
@@ -62,6 +63,11 @@ const sendMoney = async (payload: Partial<ITransaction>, userId: string) => {
     if (!reciver) {
         throw new Error("Reciever does not exist")
     }
+
+    if (reciver.role !== Role.USER) {
+        throw new Error("Receiver must be a user");
+    }
+
     // check sender wallet is exist or not
     const senderWallet = await Wallet.findOne({ userId: userId }).session(session);
     if (senderWallet?.walletStatus === Wallet_Status.BLOCK) {
@@ -104,6 +110,7 @@ const sendMoney = async (payload: Partial<ITransaction>, userId: string) => {
         type: IPaymentType.SENDMONEY,
         initiate: userId
     }], { session });
+
     await session.commitTransaction();
     session.endSession();
     return transaction
@@ -111,73 +118,103 @@ const sendMoney = async (payload: Partial<ITransaction>, userId: string) => {
 
 }
 
-const withdrawByUser = async (payload: Partial<ITransaction>, userId: string) => {
-    const { from, amount } = payload;
+const withdrawByUser = async (amount: number, userId: string) => {
 
-    const isValidUser = await User.findById(from);
-    if (!isValidUser) {
-        throw new Error("Unvalid user")
-    }
-
-    const cashOutUser = await Wallet.findOne({ userId: from });
+    // find wallet
+    const cashOutUser = await Wallet.findOne({ userId: userId });
     if (!cashOutUser) {
-        throw new Error("This user does not exist")
+        throw new Error("Your wallet doesn't exist");
     }
 
-    if (cashOutUser?.walletStatus === Wallet_Status.BLOCK) {
-        throw new Error("Wallet is block")
+    if (cashOutUser.walletStatus === Wallet_Status.BLOCK) {
+        throw new Error("Your wallet is blocked");
     }
 
     if (typeof amount !== "number" || isNaN(amount)) {
-        throw new Error("Amount should be valid number")
+        throw new Error("Amount should be a valid number");
     }
 
-    cashOutUser.balance = cashOutUser.balance - amount;
-    cashOutUser.save();
+    if (cashOutUser.balance < amount) {
+        throw new Error("Not enough balance");
+    }
+
+    // withdraw
+    cashOutUser.balance -= amount;
+    await cashOutUser.save();
 
     const transaction = await Transaction.create({
-        from: from,
-        amount: amount,
+        from: userId, // ✅ always logged-in user
+        amount,
         type: IPaymentType.WITHDRAW,
-        initiate: userId
-    })
+        initiate: userId,
+    });
 
     return transaction;
-
 }
-
 
 // cashin by agent
 const cashInMoney = async (payload: Partial<ITransaction>, userId: string) => {
-    const { to, amount } = payload
-    const reciever = await Wallet.findOne({ userId: to })
-    if (!reciever) {
-        throw new Error("This user doesn't exist")
-    }
-    if (reciever?.walletStatus === Wallet_Status.BLOCK) {
-        throw new Error("This wallet is block")
-    }
+    const { to, amount } = payload;
+
+    // Validate amount
     if (typeof amount !== "number" || isNaN(amount)) {
-        throw new Error("Amount should be valid number")
+        throw new Error("Amount should be a valid number");
     }
-    const sender = await Wallet.findOne({ _id: userId })
-    
-    if (Number(sender?.balance) > amount) {
-        throw new Error("Insufficient balance")
-    }
- 
-    reciever.balance = reciever.balance + amount;
-    reciever.save()
 
-    const createTransaction = await Transaction.create({
-        to: reciever,
-        amount: amount,
+    // Validate sender (agent)
+    const sender = await Wallet.findOne({userId: userId});
+    if (!sender) {
+        throw new Error("Sender wallet not found");
+    }
+
+    const senderUser = await User.findById(userId)
+
+    // ✅ sender must be an AGENT
+    if (sender.walletType !== IType.AGENT) {
+        throw new Error("Only agents are allowed to cash in money");
+    }
+
+    // ✅ sender's wallet must be ACTIVE
+    if (senderUser?.userStatus !== UserStatus.APPROVED) {
+        throw new Error("Your agent account is not yet approved by admin. Wait till the approved");
+    }
+
+    // ✅ sender.balance must be <= amount (your rule)
+    if (sender.balance < amount) {
+        throw new Error("You can't send money if your balance is greater than the amount"); // as per your condition
+    }
+
+    // ✅ Find receiver
+    const receiver = await Wallet.findOne({ userId: to });
+    if (!receiver) {
+        throw new Error("Receiver wallet not found");
+    }
+
+    // ✅ Receiver's wallet must not be BLOCKED
+    if (receiver.walletStatus === Wallet_Status.BLOCK) {
+        throw new Error("Receiver's wallet is blocked");
+    }
+
+    // ✅ Do the balance update
+    sender.balance -= amount;
+    receiver.balance += amount;
+
+
+    // ✅ Save updated wallets
+    await sender.save();
+    await receiver.save();
+
+    // ✅ Create transaction
+    const transaction = await Transaction.create({
+        to: to,
+        amount,
         type: IPaymentType.AGENT_CASHIN,
-        initiate: userId
-    })
+        initiate: userId,
+    });
 
-    return createTransaction;
-}
+    return transaction;
+};
+
 
 // cashout by agent
 const cashoutMoney = async (payload: Partial<ITransaction>, userEmail: string) => {
@@ -198,7 +235,7 @@ const cashoutMoney = async (payload: Partial<ITransaction>, userEmail: string) =
     const createTransaction = await Transaction.create({
         from: sender,
         amount: amount,
-        type: IPaymentType.AGENT_CASHIN,
+        type: IPaymentType.AGENT_CASHOUT,
         initiate: userEmail
     })
     return createTransaction;
@@ -237,6 +274,8 @@ const changeWalletStatus = async (walletId: string, payload: IWallet,) => {
 
     return updatedWallet;
 };
+
+
 
 export const WalletService = {
     walletCreate,
