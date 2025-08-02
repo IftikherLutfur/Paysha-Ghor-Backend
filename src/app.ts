@@ -5,9 +5,9 @@ import { walletRoute } from "./app/modules/wallet/wallet.route"
 const app = express()
 
 app.use(express.json())
-app.use("/api/user", userRoute)
-app.use("/api/auth", authRouter)
-app.use("/api/wallet", walletRoute)
+app.use("api/user", userRoute)
+app.use("api/auth", authRouter)
+app.use("api/wallet", walletRoute)
 
 app.get("/", async(req:Request, res: Response)=>{
     res.status(200).json({
