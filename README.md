@@ -47,10 +47,14 @@ POST /api/user — Register a new user
 
 {
   "name": "Shakib",
+  
   "email": "shakib@gmail.com",
+  
   "password": "Abcd@1234",
+  
   "role": "USER" | "AGENT"
 }
+
 GET /api/user — Get all users (Admin only)
 
 PATCH /api/user/agent-approve/:userId — Approve/Suspend an agent
@@ -58,6 +62,7 @@ PATCH /api/user/agent-approve/:userId — Approve/Suspend an agent
 {
   "userStatus": "PENDING" | "APPROVED" | "SUSPEND"
 }
+
 💳 Wallet Routes
 GET /api/wallet/:walletId — Get wallet by wallet ID
 
@@ -67,12 +72,15 @@ POST /api/wallet/deposit — Deposit money (by user)
 
 {
   "from": "userId",
+  
   "amount": 20
 }
+
 POST /api/wallet/sendMoney — Send money (user to user)
 
 {
   "to": "receiverUserId",
+  
   "amount": 150
 }
 POST /api/wallet/withdraw — Withdraw money (user)
@@ -84,6 +92,7 @@ POST /api/wallet/cash-in — Agent adds money to user
 
 {
   "to": "userId",
+  
   "amount": 15
 }
 POST /api/wallet/cash-out — Agent withdraws from user
