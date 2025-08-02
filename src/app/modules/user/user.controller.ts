@@ -1,13 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { UserService } from "./user.service";
 import { sendResponse } from "../../utils/sendResponse";
+import { catchAsync } from "../../utils/catchAsymc";
 
 
-
-
-
-
-const createUser = async(req:Request, res: Response, next:NextFunction)=>{
+const createUser = catchAsync(async(req:Request, res: Response, next:NextFunction)=>{
     try {
         const payload = req.body;
     const user = await UserService.userCreate(payload)
@@ -25,13 +22,13 @@ const createUser = async(req:Request, res: Response, next:NextFunction)=>{
             error
         })
     }
-}
+})
 
 
 
 
 
-const getAllUser = async(req:Request,res:Response) =>{
+const getAllUser = catchAsync(async(req:Request,res:Response) =>{
     try {
         const findAllUser = await UserService.findAllUser()
     sendResponse(res,{
@@ -48,9 +45,9 @@ const getAllUser = async(req:Request,res:Response) =>{
             error
         })
     }
-}
+})
 
-const agentApprove = async(req:Request, res:Response) =>{
+const agentApprove = catchAsync(async(req:Request, res:Response) =>{
     try {
         const { agentId } = req.params;
         const payload = req.body;
@@ -69,7 +66,7 @@ const agentApprove = async(req:Request, res:Response) =>{
             error
         })
     }
-}
+})
 
 
 export const UserController = {

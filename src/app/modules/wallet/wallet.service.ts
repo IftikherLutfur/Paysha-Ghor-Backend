@@ -94,8 +94,8 @@ const sendMoney = async (payload: Partial<ITransaction>, userId: string) => {
     senderWallet.balance = senderWallet.balance - amount;
     recieverWallet.balance += amount;
 
-    await senderWallet.save({session});
-    await recieverWallet.save({session});
+    await senderWallet.save({ session });
+    await recieverWallet.save({ session });
 
     const transaction = await Transaction.create([{
         from: userId,
@@ -104,7 +104,7 @@ const sendMoney = async (payload: Partial<ITransaction>, userId: string) => {
         type: IPaymentType.SENDMONEY,
         initiate: userId
     }], { session });
- await session.commitTransaction();
+    await session.commitTransaction();
     session.endSession();
     return transaction
 
@@ -148,10 +148,8 @@ const withdrawByUser = async (payload: Partial<ITransaction>, userId: string) =>
 
 
 // cashin by agent
-const cashInMoney = async (payload: Partial<ITransaction>, userEmail: string) => {
+const cashInMoney = async (payload: Partial<ITransaction>, userId: string) => {
     const { to, amount } = payload
-
-
     const reciever = await Wallet.findOne({ userId: to })
     if (!reciever) {
         throw new Error("This user doesn't exist")
@@ -162,6 +160,12 @@ const cashInMoney = async (payload: Partial<ITransaction>, userEmail: string) =>
     if (typeof amount !== "number" || isNaN(amount)) {
         throw new Error("Amount should be valid number")
     }
+    const sender = await Wallet.findOne({ _id: userId })
+    
+    if (Number(sender?.balance) > amount) {
+        throw new Error("Insufficient balance")
+    }
+ 
     reciever.balance = reciever.balance + amount;
     reciever.save()
 
@@ -169,7 +173,7 @@ const cashInMoney = async (payload: Partial<ITransaction>, userEmail: string) =>
         to: reciever,
         amount: amount,
         type: IPaymentType.AGENT_CASHIN,
-        initiate: userEmail
+        initiate: userId
     })
 
     return createTransaction;

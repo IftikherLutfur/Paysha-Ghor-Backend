@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { sendResponse } from "../../utils/sendResponse";
 import { WalletService } from "./wallet.service";
+import { catchAsync } from "../../utils/catchAsymc";
 
 
 // const createWallet = async (req: Request, res: Response, next: NextFunction) => {
@@ -25,7 +26,7 @@ import { WalletService } from "./wallet.service";
 //     }
 // }
 // pop-up
-const depositeByUser = async (req: Request, res: Response) => {
+const depositeByUser = catchAsync(async (req: Request, res: Response) => {
     try {
         const userId = req.user._id;
         const { amount } = req.body;
@@ -48,8 +49,8 @@ const depositeByUser = async (req: Request, res: Response) => {
         console.log(error);
     }
 }
-
-const sendMoney = async (req: Request, res: Response) => {
+)
+const sendMoney = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
     const userId = req.user._id;
     const send = await WalletService.sendMoney(payload, userId)
@@ -59,21 +60,21 @@ const sendMoney = async (req: Request, res: Response) => {
         statusCode: res.statusCode,
         data: send
     })
-}
+})
 
-const cashIn = async (req: Request, res: Response) => {
+const cashIn = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
-    const userEmail = req.user._id;
-    const cashInByAgent = await WalletService.cashInMoney(payload, userEmail);
+    const userId = req.user._id;
+    const cashInByAgent = await WalletService.cashInMoney(payload, userId);
     sendResponse(res, {
         success: true,
         message: "Cashin Successful",
         statusCode: res.statusCode,
         data: cashInByAgent
     })
-}
+})
 
-const cashout = async (req: Request, res: Response) => {
+const cashout = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
     const userId = req.user._id;
     const cashInByAgent = await WalletService.cashoutMoney(payload, userId);
@@ -83,9 +84,9 @@ const cashout = async (req: Request, res: Response) => {
         statusCode: res.statusCode,
         data: cashInByAgent
     })
-}
+})
 
-const withdraw = async (req: Request, res: Response) => {
+const withdraw = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
     const userId = req.user._id;
     const withdraw = await WalletService.withdrawByUser(payload, userId)
@@ -96,9 +97,9 @@ const withdraw = async (req: Request, res: Response) => {
         data: withdraw
     })
 
-}
+})
 
-const getAllTransaction = async (req: Request, res: Response) => {
+const getAllTransaction = catchAsync(async (req: Request, res: Response) => {
     const transaction = await WalletService.getAllTransaction()
     sendResponse(res, {
         success: true,
@@ -106,9 +107,9 @@ const getAllTransaction = async (req: Request, res: Response) => {
         statusCode: res.statusCode,
         data: transaction
     })
-}
+})
 
-const getIndividualWallet = async (req: Request, res: Response) => {
+const getIndividualWallet = catchAsync(async (req: Request, res: Response) => {
     const walletId = req.params.id;
     const getIndividual = await WalletService.getIndividualWallet(walletId);
     sendResponse(res, {
@@ -117,9 +118,9 @@ const getIndividualWallet = async (req: Request, res: Response) => {
         statusCode: res.statusCode,
         data: getIndividual
     })
-}
+})
 
-const getIndividualTransaction = async (req: Request, res: Response) => {
+const getIndividualTransaction = catchAsync(async (req: Request, res: Response) => {
     const transActionId = req.params.id
     const getYourOwnTransaction = await WalletService.getOwnTransaction(transActionId)
     sendResponse(res, {
@@ -128,9 +129,9 @@ const getIndividualTransaction = async (req: Request, res: Response) => {
         statusCode: res.statusCode,
         data: getYourOwnTransaction
     })
-}
+})
 
-const changeWalletStatus = async (req: Request, res: Response) => {
+const changeWalletStatus = catchAsync(async (req: Request, res: Response) => {
     try {
         const walletId = req.params.id;
         const payload = req.body;
@@ -150,7 +151,7 @@ const changeWalletStatus = async (req: Request, res: Response) => {
             data: null,
         });
     }
-};
+})
 
 
 export const WalletController = {
