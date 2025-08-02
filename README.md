@@ -33,10 +33,8 @@ All routes are protected with JWT and role-based middleware.
 
 **POST /api/auth/login` — Login**  
  
-  {
-    "email": "iftikher@gmail.com",
-    "password": "1234Abdullah$$%%"
-  }
+ `{"email": "iftikher@gmail.com",
+    "password": "1234Abdullah$$%%"}`
 **POST /api/auth/logout — Logout**
 
 📦 API Endpoints
@@ -46,68 +44,46 @@ All routes are protected with JWT and role-based middleware.
 
 **POST /api/user — Register a new user**
 
-{
-  "name": "Shakib",
-  
+`{"name": "Shakib",
   "email": "shakib@gmail.com",
-  
   "password": "Abcd@1234",
-  
-  "role": "USER" | "AGENT"
-}
+  "role": "USER" | "AGENT"}`
 
 **GET /api/user — Get all users (Admin only)**
 
 **PATCH /api/user/agent-approve/:userId — Approve/Suspend an agent**
 
-{
-  "userStatus": "PENDING" | "APPROVED" | "SUSPEND"
-}
+`{ "userStatus": "PENDING" | "APPROVED" | "SUSPEND"}`
 
 ## 💳 Wallet Routes
 
-**GET /api/wallet/:walletId — Get wallet by wallet ID**
+**GET /api/wallet/:userId — Get individually wallet by user ID**
 
-**GET /api/wallet/user/:userId — Get wallet by user ID**
+**GET /api/wallet/ — Get all wallet only for admin**
 
 **POST /api/wallet/deposit — Deposit money (by user)**
 
-{
-  "from": "userId",
-  
-  "amount": 20
-}
+`{"from": "userId","amount": 20}`
 
 **POST /api/wallet/sendMoney — Send money (user to user)**
 
-{
-  "to": "receiverUserId",
-  
-  "amount": 150
-}
+`{"to": "receiverUserId","amount": 150}`
 
 **POST /api/wallet/withdraw — Withdraw money (user)**
 
-{
-  "amount": 1000
-}
+`{"amount": 1000}`
+
 **POST /api/wallet/cash-in — Agent adds money to user**
 
-{
-  "to": "userId",
-  
-  "amount": 15
-}
+`{"to": "userId", "amount": 150}`
+
 **POST /api/wallet/cash-out — Agent withdraws from user**
 
-{
-  "from": "userId",
-  "amount": 200
-}
+`{"from": "userId","amount": 200}`
+
 📄 Transaction Routes
 
 **GET /api/wallet/transaction — Get all transactions (Admin only)**
-
 **GET /api/wallet/transaction/:userId — Get transactions for specific user**
 
 ⚙️ Technologies Used
@@ -131,19 +107,17 @@ Edit
 git clone https://github.com/your-username/paysha-ghor-backend.git
 cd paysha-ghor-backend
 
-# Install dependencies
+## Install dependencies
 npm install
 
-# Create .env file
+## Create .env file
 cp .env.example .env
-# Set your MongoDB URI, JWT_SECRET, etc.
+## Set your MongoDB URI, JWT_SECRET, etc.
 
-# Run the server
+## Run the server
 npm run dev
 
 🧠 Author
-Iftikher Lutfur Abdullah
-
-🧑‍💻 Junior Full Stack Developer
-
-📧 iftikherabdullah@gmail.com
+**Iftikher Lutfur Abdullah**
+-**🧑‍💻 Junior Full Stack Developer**
+**📧 iftikherabdullah@gmail.com**
