@@ -46,8 +46,8 @@ All routes are protected with JWT and role-based middleware.
 
 **POST /api/user — Register a new user**
 
-`{"name": "Shakib",
-  "email": "shakib@gmail.com",
+`{
+  "email": "test@gmail.com",
   "password": "Abcd@1234",
   "role": "USER" | "AGENT"}`
 
