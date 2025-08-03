@@ -35,6 +35,7 @@ All routes are protected with JWT and role-based middleware.
 **Admin Loginn**
 `{ "email":"admin@gmail.com",
     "password": "Abcd@1234"  }`
+    
 **Agent Login**
 `{
    "email":"abdullah@gmail.com",
@@ -118,19 +119,6 @@ All routes are protected with JWT and role-based middleware.
 
 🛠️ Project Setup
 
-## Clone the repo
-git clone https://github.com/your-username/paysha-ghor-backend.git
-cd paysha-ghor-backend
-
-## Install dependencies
-npm install
-
-## Create .env file
-cp .env.example .env
-## Set your MongoDB URI, JWT_SECRET, etc.
-
-## Run the server
-npm run dev
 
 🧠 Author
 **Iftikher Lutfur Abdullah**
