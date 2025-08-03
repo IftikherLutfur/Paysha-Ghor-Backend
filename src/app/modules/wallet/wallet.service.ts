@@ -25,6 +25,11 @@ const walletCreate = async (payload: Partial<IWallet>, userId: string) => {
     return walletWithUser
 }
 
+const allWallets = async() =>{
+    const wallets = await Wallet.find({})
+    return wallets;
+}
+
 // pop-up
 const deposite = async (userId: string, amount: number) => {
     const wallet = await Wallet.findOne({ userId })
@@ -279,6 +284,7 @@ const changeWalletStatus = async (walletId: string, payload: IWallet,) => {
 
 export const WalletService = {
     walletCreate,
+    allWallets,
     deposite,
     sendMoney,
     withdrawByUser,

@@ -7,6 +7,7 @@ import { transactionValidation, walletValidation } from "./wallet.validation";
 
 const wallet = Router();
 
+wallet.post("/",checkAuth(Role.ADMIN), WalletController.getAllWallet)
 wallet.post("/deposite",checkAuth(Role.USER), zodValidation(transactionValidation), WalletController.depositeByUser)
 wallet.post("/sendMoney", checkAuth(Role.USER), zodValidation(transactionValidation), WalletController.sendMoney)
 wallet.post("/withdraw", checkAuth(Role.USER), zodValidation(transactionValidation), WalletController.withdraw)

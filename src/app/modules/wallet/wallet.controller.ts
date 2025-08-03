@@ -4,27 +4,17 @@ import { WalletService } from "./wallet.service";
 import { catchAsync } from "../../utils/catchAsymc";
 
 
-// const createWallet = async (req: Request, res: Response, next: NextFunction) => {
-//     try {
-//         const payload = req.body;
-//         const userId = req.user?._id;
+const getAllWallet = async(req:Request, res:Response)=>{
+   const wallets = await WalletService.allWallets()
+   sendResponse(res,{
+    success: true,
+    message:"All wallets retrived",
+    statusCode: res.statusCode,
+    data: wallets
+    
+   })
+}
 
-//         // Id'r formate thik ache kina ta check korlam
-//         // if (!mongoose.Types.ObjectId.isValid(payload.userId)) {
-//         //     throw new Error("Invalid userId format in body");
-//         // }
-//         const walletCreate = (await WalletService.walletCreate(payload, userId as string));
-//         sendResponse(res, {
-//             success: true,
-//             message: "Wallet created successfully",
-//             statusCode: res.statusCode,
-//             data: walletCreate
-//         })
-//     } catch (error) {
-//         next(error)
-//         console.log(error);
-//     }
-// }
 // pop-up
 const depositeByUser = catchAsync(async (req: Request, res: Response) => {
     try {
@@ -76,6 +66,7 @@ const cashIn = catchAsync(async (req: Request, res: Response) => {
     statusCode: res.statusCode
   });
 });
+
 
 
 const cashout = catchAsync(async (req: Request, res: Response) => {
@@ -161,7 +152,7 @@ const changeWalletStatus = catchAsync(async (req: Request, res: Response) => {
 
 
 export const WalletController = {
-    // createWallet,
+    getAllWallet,
     depositeByUser,
     sendMoney,
     withdraw,

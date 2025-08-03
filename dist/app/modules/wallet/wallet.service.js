@@ -17,6 +17,7 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const user_model_1 = require("../user/user.model");
 const wallet_interface_1 = require("./wallet.interface");
 const wallet_model_1 = require("./wallet.model");
+const user_interface_1 = require("../user/user.interface");
 const walletCreate = (payload, userId) => __awaiter(void 0, void 0, void 0, function* () {
     // 1 jon user er 2 ta wallet jate khulte na pare
     const isSameWalletExist = yield wallet_model_1.Wallet.findOne({ userId });
@@ -63,6 +64,9 @@ const sendMoney = (payload, userId) => __awaiter(void 0, void 0, void 0, functio
     if (!reciver) {
         throw new Error("Reciever does not exist");
     }
+    if (reciver.role !== user_interface_1.Role.USER) {
+        throw new Error("Receiver must be a user");
+    }
     // check sender wallet is exist or not
     const senderWallet = yield wallet_model_1.Wallet.findOne({ userId: userId }).session(session);
     if ((senderWallet === null || senderWallet === void 0 ? void 0 : senderWallet.walletStatus) === wallet_interface_1.Wallet_Status.BLOCK) {
@@ -103,58 +107,80 @@ const sendMoney = (payload, userId) => __awaiter(void 0, void 0, void 0, functio
     session.endSession();
     return transaction;
 });
-const withdrawByUser = (payload, userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const { from, amount } = payload;
-    const isValidUser = yield user_model_1.User.findById(from);
-    if (!isValidUser) {
-        throw new Error("Unvalid user");
-    }
-    const cashOutUser = yield wallet_model_1.Wallet.findOne({ userId: from });
+const withdrawByUser = (amount, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    // find wallet
+    const cashOutUser = yield wallet_model_1.Wallet.findOne({ userId: userId });
     if (!cashOutUser) {
-        throw new Error("This user does not exist");
+        throw new Error("Your wallet doesn't exist");
     }
-    if ((cashOutUser === null || cashOutUser === void 0 ? void 0 : cashOutUser.walletStatus) === wallet_interface_1.Wallet_Status.BLOCK) {
-        throw new Error("Wallet is block");
+    if (cashOutUser.walletStatus === wallet_interface_1.Wallet_Status.BLOCK) {
+        throw new Error("Your wallet is blocked");
     }
     if (typeof amount !== "number" || isNaN(amount)) {
-        throw new Error("Amount should be valid number");
+        throw new Error("Amount should be a valid number");
     }
-    cashOutUser.balance = cashOutUser.balance - amount;
-    cashOutUser.save();
+    if (cashOutUser.balance < amount) {
+        throw new Error("Not enough balance");
+    }
+    // withdraw
+    cashOutUser.balance -= amount;
+    yield cashOutUser.save();
     const transaction = yield wallet_model_1.Transaction.create({
-        from: from,
-        amount: amount,
+        from: userId, // ✅ always logged-in user
+        amount,
         type: wallet_interface_1.IPaymentType.WITHDRAW,
-        initiate: userId
+        initiate: userId,
     });
     return transaction;
 });
 // cashin by agent
 const cashInMoney = (payload, userId) => __awaiter(void 0, void 0, void 0, function* () {
     const { to, amount } = payload;
-    const reciever = yield wallet_model_1.Wallet.findOne({ userId: to });
-    if (!reciever) {
-        throw new Error("This user doesn't exist");
-    }
-    if ((reciever === null || reciever === void 0 ? void 0 : reciever.walletStatus) === wallet_interface_1.Wallet_Status.BLOCK) {
-        throw new Error("This wallet is block");
-    }
+    // Validate amount
     if (typeof amount !== "number" || isNaN(amount)) {
-        throw new Error("Amount should be valid number");
+        throw new Error("Amount should be a valid number");
     }
-    const sender = yield wallet_model_1.Wallet.findOne({ _id: userId });
-    if (Number(sender === null || sender === void 0 ? void 0 : sender.balance) > amount) {
-        throw new Error("Insufficient balance");
+    // Validate sender (agent)
+    const sender = yield wallet_model_1.Wallet.findOne({ userId: userId });
+    if (!sender) {
+        throw new Error("Sender wallet not found");
     }
-    reciever.balance = reciever.balance + amount;
-    reciever.save();
-    const createTransaction = yield wallet_model_1.Transaction.create({
-        to: reciever,
-        amount: amount,
+    const senderUser = yield user_model_1.User.findById(userId);
+    // ✅ sender must be an AGENT
+    if (sender.walletType !== wallet_interface_1.IType.AGENT) {
+        throw new Error("Only agents are allowed to cash in money");
+    }
+    // ✅ sender's wallet must be ACTIVE
+    if ((senderUser === null || senderUser === void 0 ? void 0 : senderUser.userStatus) !== user_interface_1.UserStatus.APPROVED) {
+        throw new Error("Your agent account is not yet approved by admin. Wait till the approved");
+    }
+    // ✅ sender.balance must be <= amount (your rule)
+    if (sender.balance < amount) {
+        throw new Error("You can't send money if your balance is greater than the amount"); // as per your condition
+    }
+    // ✅ Find receiver
+    const receiver = yield wallet_model_1.Wallet.findOne({ userId: to });
+    if (!receiver) {
+        throw new Error("Receiver wallet not found");
+    }
+    // ✅ Receiver's wallet must not be BLOCKED
+    if (receiver.walletStatus === wallet_interface_1.Wallet_Status.BLOCK) {
+        throw new Error("Receiver's wallet is blocked");
+    }
+    // ✅ Do the balance update
+    sender.balance -= amount;
+    receiver.balance += amount;
+    // ✅ Save updated wallets
+    yield sender.save();
+    yield receiver.save();
+    // ✅ Create transaction
+    const transaction = yield wallet_model_1.Transaction.create({
+        to: to,
+        amount,
         type: wallet_interface_1.IPaymentType.AGENT_CASHIN,
-        initiate: userId
+        initiate: userId,
     });
-    return createTransaction;
+    return transaction;
 });
 // cashout by agent
 const cashoutMoney = (payload, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
@@ -174,7 +200,7 @@ const cashoutMoney = (payload, userEmail) => __awaiter(void 0, void 0, void 0, f
     const createTransaction = yield wallet_model_1.Transaction.create({
         from: sender,
         amount: amount,
-        type: wallet_interface_1.IPaymentType.AGENT_CASHIN,
+        type: wallet_interface_1.IPaymentType.AGENT_CASHOUT,
         initiate: userEmail
     });
     return createTransaction;
