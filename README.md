@@ -29,6 +29,34 @@ A role-based digital wallet backend built with **Node.js**, **Express.js**, and 
 
 All routes are protected with JWT and role-based middleware.
 
+📦 API Endpoints
+🟢 Base URL: https://poysha-ghor.vercel.app
+
+**Admin Loginn**
+`{ "email":"admin@gmail.com",
+    "password": "Abcd@1234"  }`
+    
+**Agent Login**
+`{
+   "email":"abdullah@gmail.com",
+    "password": "1234Abdullah$$%%"  
+}`
+
+## 👤 User Routes
+
+**POST /api/user — Register a new user**
+
+`{
+  "email": "test@gmail.com",
+  "password": "Abcd@1234",
+  "role": "USER" | "AGENT"}`
+
+**GET /api/user — Get all users (Admin only)**
+
+**PATCH /api/user/agent-approve/:userId — Approve/Suspend an agent**
+
+`{ "userStatus": "PENDING"(By default) | "APPROVED" | "SUSPEND"}`
+
 ### 🔑 Auth Routes
 
 **POST /api/auth/login` — Login**  
@@ -37,31 +65,13 @@ All routes are protected with JWT and role-based middleware.
     "password": "1234Abdullah$$%%"}`
 **POST /api/auth/logout — Logout**
 
-📦 API Endpoints
-🟢 Base URL: http://localhost:5000/
-
-## 👤 User Routes
-
-**POST /api/user — Register a new user**
-
-`{"name": "Shakib",
-  "email": "shakib@gmail.com",
-  "password": "Abcd@1234",
-  "role": "USER" | "AGENT"}`
-
-**GET /api/user — Get all users (Admin only)**
-
-**PATCH /api/user/agent-approve/:userId — Approve/Suspend an agent**
-
-`{ "userStatus": "PENDING" | "APPROVED" | "SUSPEND"}`
-
 ## 💳 Wallet Routes
 
 **GET /api/wallet/:userId — Get individually wallet by user ID**
 
 **GET /api/wallet/ — Get all wallet only for admin**
 
-**POST /api/wallet/deposit — Deposit money (by user)**
+**POST /api/wallet/deposite — Deposit money (by user)**
 
 `{"from": "userId","amount": 20}`
 
@@ -77,15 +87,22 @@ All routes are protected with JWT and role-based middleware.
 
 `{"to": "userId", "amount": 150}`
 
-**POST /api/wallet/cash-out — Agent withdraws from user**
+`**POST /api/wallet/cash-out — Agent withdraws from user**`
 
 `{"from": "userId","amount": 200}`
+
+**PATCH /api/wallet/:walletId**
+`{
+    "walletStatus": "BLOCK"
+}`
 
 📄 Transaction Routes
 
 -**GET /api/wallet/transaction — Get all transactions (Admin only)**
 
 -**GET /api/wallet/transaction/:userId — Get transactions for specific user**
+
+
 
 ⚙️ Technologies Used
 🟨 Node.js
@@ -102,19 +119,6 @@ All routes are protected with JWT and role-based middleware.
 
 🛠️ Project Setup
 
-## Clone the repo
-git clone https://github.com/your-username/paysha-ghor-backend.git
-cd paysha-ghor-backend
-
-## Install dependencies
-npm install
-
-## Create .env file
-cp .env.example .env
-## Set your MongoDB URI, JWT_SECRET, etc.
-
-## Run the server
-npm run dev
 
 🧠 Author
 **Iftikher Lutfur Abdullah**
