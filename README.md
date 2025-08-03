@@ -38,7 +38,7 @@ All routes are protected with JWT and role-based middleware.
 **POST /api/auth/logout — Logout**
 
 📦 API Endpoints
-🟢 Base URL: http://localhost:5000/
+🟢 Base URL: https://poysha-ghor.vercel.app
 
 ## 👤 User Routes
 
