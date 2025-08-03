@@ -69,7 +69,7 @@ All routes are protected with JWT and role-based middleware.
 
 **GET /api/wallet/:userId — Get individually wallet by user ID**
 
-**GET /api/wallet/ — Get all wallet only for admin**
+**GET /api/wallet — Get all wallet only for admin**
 
 **POST /api/wallet/deposite — Deposit money (by user)**
 
@@ -87,7 +87,7 @@ All routes are protected with JWT and role-based middleware.
 
 `{"to": "userId", "amount": 150}`
 
-`**POST /api/wallet/cash-out — Agent withdraws from user**`
+**POST /api/wallet/cash-out — Agent withdraws from user**
 
 `{"from": "userId","amount": 200}`
 
