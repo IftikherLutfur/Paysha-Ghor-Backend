@@ -55,7 +55,7 @@ All routes are protected with JWT and role-based middleware.
 
 **PATCH /api/user/agent-approve/:userId — Approve/Suspend an agent**
 
-`{ "userStatus": "PENDING" | "APPROVED" | "SUSPEND"}`
+`{ "userStatus": "PENDING"(By default) | "APPROVED" | "SUSPEND"}`
 
 ### 🔑 Auth Routes
 
@@ -71,7 +71,7 @@ All routes are protected with JWT and role-based middleware.
 
 **GET /api/wallet/ — Get all wallet only for admin**
 
-**POST /api/wallet/deposit — Deposit money (by user)**
+**POST /api/wallet/deposite — Deposit money (by user)**
 
 `{"from": "userId","amount": 20}`
 
@@ -87,11 +87,11 @@ All routes are protected with JWT and role-based middleware.
 
 `{"to": "userId", "amount": 150}`
 
-**POST /api/wallet/cash-out — Agent withdraws from user**
+`**POST /api/wallet/cash-out — Agent withdraws from user**`
 
 `{"from": "userId","amount": 200}`
 
-**PATCH /api/wallet/walletId**
+**PATCH /api/wallet/:walletId**
 `{
     "walletStatus": "BLOCK"
 }`
