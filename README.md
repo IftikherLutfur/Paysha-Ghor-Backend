@@ -90,11 +90,18 @@ All routes are protected with JWT and role-based middleware.
 
 `{"from": "userId","amount": 200}`
 
+**PATCH /api/wallet/walletId**
+`{
+    "walletStatus": "BLOCK"
+}`
+
 📄 Transaction Routes
 
 -**GET /api/wallet/transaction — Get all transactions (Admin only)**
 
 -**GET /api/wallet/transaction/:userId — Get transactions for specific user**
+
+
 
 ⚙️ Technologies Used
 🟨 Node.js
