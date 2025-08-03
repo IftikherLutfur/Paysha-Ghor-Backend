@@ -32,6 +32,15 @@ All routes are protected with JWT and role-based middleware.
 📦 API Endpoints
 🟢 Base URL: https://poysha-ghor.vercel.app
 
+**Admin Loginn**
+`{ "email":"admin@gmail.com",
+    "password": "Abcd@1234"  }`
+**Agent Login**
+`{
+   "email":"abdullah@gmail.com",
+    "password": "1234Abdullah$$%%"  
+}`
+
 ## 👤 User Routes
 
 **POST /api/user — Register a new user**
