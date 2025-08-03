@@ -29,14 +29,6 @@ A role-based digital wallet backend built with **Node.js**, **Express.js**, and 
 
 All routes are protected with JWT and role-based middleware.
 
-### 🔑 Auth Routes
-
-**POST /api/auth/login` — Login**  
- 
- `{"email": "iftikher@gmail.com",
-    "password": "1234Abdullah$$%%"}`
-**POST /api/auth/logout — Logout**
-
 📦 API Endpoints
 🟢 Base URL: https://poysha-ghor.vercel.app
 
@@ -54,6 +46,14 @@ All routes are protected with JWT and role-based middleware.
 **PATCH /api/user/agent-approve/:userId — Approve/Suspend an agent**
 
 `{ "userStatus": "PENDING" | "APPROVED" | "SUSPEND"}`
+
+### 🔑 Auth Routes
+
+**POST /api/auth/login` — Login**  
+ 
+ `{"email": "iftikher@gmail.com",
+    "password": "1234Abdullah$$%%"}`
+**POST /api/auth/logout — Logout**
 
 ## 💳 Wallet Routes
 
