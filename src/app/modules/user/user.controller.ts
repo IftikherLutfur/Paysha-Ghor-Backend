@@ -61,28 +61,31 @@ const getAllUser = catchAsync(async(req:Request,res:Response) =>{
 })
 
 const agentApprove = catchAsync(async(req:Request, res:Response) =>{
-    try {
-        const { agentId } = req.params;
-        const payload = req.body;
-        const user = await UserService.agentApprove(agentId, payload);
-        sendResponse(res,{
-            success: true,
-            message: "Agent approved successfully",
-            data: user,
-            statusCode: res.statusCode,
-        })
-    } catch (error) {
-        console.log(error);
-        res.status(400).json({
-            success: false,
-            message:"Something went wrong",
-            error
-        })
-    }
+  try {
+    const { agentId } = req.params;
+    const body = req.body;  // ✅ এখন destructure safe
+
+    const user = await UserService.agentApprove(agentId, body);
+
+    sendResponse(res,{
+      success: true,
+      message: "Agent approved successfully",
+      data: user,
+      statusCode: res.statusCode,
+    })
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      success: false,
+      message:"Something went wrong",
+      error
+    })
+  }
 })
 
 const editProfile = catchAsync(async(req:Request, res:Response)=>{
     const body = req.body;
+    console.log(body)
     const decodedUser = req.user as MyJwtPayload;
     const updateUser = await UserService.updateUser(body,decodedUser.userId)
     sendResponse(res,{

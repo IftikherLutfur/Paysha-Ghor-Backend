@@ -51,15 +51,21 @@ const findAllUser = async () => {
 }
 
 const agentApprove = async (agentId: string, payload: IUser) => {
-  const isAgent = await User.findById(agentId);
-  if (isAgent?.role !== Role.AGENT) {
+  const isAgent = await User.findById(agentId)
+  if (!isAgent || isAgent.role !== Role.AGENT) {
     throw new Error("Agent not found")
   }
-  const agent = await User.findByIdAndUpdate({ _id: agentId },
-    { $set: { userStatus: payload.userStatus } },
+
+  const agent = await User.findByIdAndUpdate(
+    agentId,
+    { userStatus: payload.userStatus }, // $set optional in Mongoose
     { new: true, runValidators: true }
   )
-  return agent;
+  if (!agent) {
+    throw new Error("Failed to update agent")
+  }
+
+  return agent
 }
 
 const updateUser = async (payload: IUserUpdate, userId: string) => {
@@ -87,7 +93,6 @@ const updateUser = async (payload: IUserUpdate, userId: string) => {
   if (email) updateData.email = email;
   updateData.password = hashedPassword;
 
-  // Step 5: Update query চালানো
   const update = await User.findByIdAndUpdate(
     userId,
     { $set: updateData },
