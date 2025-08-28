@@ -1,6 +1,6 @@
 import { IType, Wallet_Status } from "../wallet/wallet.interface";
 import { WalletService } from "../wallet/wallet.service";
-import { IUser, Role, UserStatus } from "./user.interface"
+import { IUser, IUserUpdate, Role, UserStatus } from "./user.interface"
 import { User } from "./user.model"
 import bcryptjs from "bcryptjs";
 
@@ -40,25 +40,68 @@ const userCreate = async (payload: IUser) => {
   return user;
 };
 
+const getMe = async (userId: String) => {
+  const getUser = await User.findById(userId).select("-password")
+  return getUser;
+}
+
 const findAllUser = async () => {
-    const findAll = await User.find({})
-    return findAll;
+  const findAll = await User.find({})
+  return findAll;
 }
 
 const agentApprove = async (agentId: string, payload: IUser) => {
-    const isAgent = await User.findById(agentId);
-    if(isAgent?.role !== Role.AGENT){
-        throw new Error("Agent not found")
-    }
-    const agent = await User.findByIdAndUpdate({ _id: agentId },
-        { $set: { userStatus: payload.userStatus } },
-        { new: true, runValidators: true }
-    )
-    return agent;
+  const isAgent = await User.findById(agentId);
+  if (isAgent?.role !== Role.AGENT) {
+    throw new Error("Agent not found")
+  }
+  const agent = await User.findByIdAndUpdate({ _id: agentId },
+    { $set: { userStatus: payload.userStatus } },
+    { new: true, runValidators: true }
+  )
+  return agent;
 }
 
+const updateUser = async (payload: IUserUpdate, userId: string) => {
+  const { name, email, currentPassword, newPassword } = payload;
+  const isUserExist = await User.findById(userId);
+
+  if (!isUserExist) {
+    throw new Error("User not found");
+  }
+
+  // Step 1: সবসময় currentPassword মিলছে কিনা চেক করবে
+  const isMatch = await bcryptjs.compare(currentPassword, isUserExist.password);
+  if (!isMatch) {
+    throw new Error("Current password is incorrect, update cancelled!");
+  }
+
+  let hashedPassword = isUserExist.password;
+  if (newPassword) {
+    hashedPassword = await bcryptjs.hash(newPassword, 10);
+  }
+
+  // Step 4: updateData বানানো
+  const updateData: Partial<IUser> = {};
+  if (name) updateData.name = name;
+  if (email) updateData.email = email;
+  updateData.password = hashedPassword;
+
+  // Step 5: Update query চালানো
+  const update = await User.findByIdAndUpdate(
+    userId,
+    { $set: updateData },
+    { new: true, runValidators: true }
+  );
+
+  return update;
+};
+
+
 export const UserService = {
-    userCreate,
-    findAllUser,
-    agentApprove
+  userCreate,
+  findAllUser,
+  agentApprove,
+  getMe,
+  updateUser
 }

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { sendResponse } from "../../utils/sendResponse";
 import { WalletService } from "./wallet.service";
 import { catchAsync } from "../../utils/catchAsymc";
+import { MyJwtPayload } from "../../utils/jwt";
 
 
 const getAllWallet = async(req:Request, res:Response)=>{
@@ -18,7 +19,7 @@ const getAllWallet = async(req:Request, res:Response)=>{
 // pop-up
 const depositeByUser = catchAsync(async (req: Request, res: Response) => {
     try {
-        const userId = req.user._id;
+        const userId = req.user as MyJwtPayload;
         const { amount } = req.body;
         const payload = req.body
 
@@ -26,7 +27,7 @@ const depositeByUser = catchAsync(async (req: Request, res: Response) => {
             throw new Error("A valid amount is required")
         }
 
-        const popUp = await WalletService.deposite(userId as string, Number(amount))
+        const popUp = await WalletService.deposite(userId.userId as string, Number(amount))
 
         sendResponse(res, {
             success: true,
@@ -42,8 +43,8 @@ const depositeByUser = catchAsync(async (req: Request, res: Response) => {
 )
 const sendMoney = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
-    const userId = req.user._id;
-    const send = await WalletService.sendMoney(payload, userId)
+    const userId = req.user as MyJwtPayload;
+    const send = await WalletService.sendMoney(payload, userId.userId)
     sendResponse(res, {
         success: true,
         message: "Money send successfully",
@@ -55,9 +56,8 @@ const sendMoney = catchAsync(async (req: Request, res: Response) => {
 // cashin by agent
 const cashIn = catchAsync(async (req: Request, res: Response) => {
   const payload = req.body;
-  const userId = req.user._id;
-
-  const result = await WalletService.cashInMoney(payload, userId);
+  const userId = req.user as MyJwtPayload;
+  const result = await WalletService.cashInMoney(payload, userId.userId);
 
   sendResponse(res, {
     success: true,
@@ -71,8 +71,8 @@ const cashIn = catchAsync(async (req: Request, res: Response) => {
 
 const cashout = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
-    const userId = req.user._id;
-    const cashInByAgent = await WalletService.cashoutMoney(payload, userId);
+    const userId = req.user as MyJwtPayload;
+    const cashInByAgent = await WalletService.cashoutMoney(payload, userId.userId);
     sendResponse(res, {
         success: true,
         message: "Cashout Successful",
@@ -83,9 +83,9 @@ const cashout = catchAsync(async (req: Request, res: Response) => {
 
 const withdraw = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
-    const userId = req.user._id;
+    const userId = req.user as MyJwtPayload;
 
-    const withdraw = await WalletService.withdrawByUser(payload.amount, userId); // ✅ only pass amount and userId
+    const withdraw = await WalletService.withdrawByUser(payload.amount, userId.userId); // ✅ only pass amount and userId
 
     sendResponse(res, {
         success: true,

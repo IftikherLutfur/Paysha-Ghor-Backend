@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { UserService } from "./user.service";
 import { sendResponse } from "../../utils/sendResponse";
 import { catchAsync } from "../../utils/catchAsymc";
+import { JwtPayload } from "jsonwebtoken";
+import { MyJwtPayload } from "../../utils/jwt";
 
 
 const createUser = catchAsync(async(req:Request, res: Response, next:NextFunction)=>{
@@ -24,9 +26,20 @@ const createUser = catchAsync(async(req:Request, res: Response, next:NextFunctio
     }
 })
 
+const getMe = catchAsync(async (req: Request, res: Response) => {
+  const decodedUser = req.user as MyJwtPayload;
 
+  console.log("Decoded from middleware:", decodedUser);
 
+  const getMyAccount = await UserService.getMe(decodedUser.userId);
 
+  sendResponse(res, {
+    success: true,
+    message: "Your info retrieved",
+    data: getMyAccount,
+    statusCode: res.statusCode,
+  });
+});
 
 const getAllUser = catchAsync(async(req:Request,res:Response) =>{
     try {
@@ -68,9 +81,25 @@ const agentApprove = catchAsync(async(req:Request, res:Response) =>{
     }
 })
 
+const editProfile = catchAsync(async(req:Request, res:Response)=>{
+    const body = req.body;
+    const decodedUser = req.user as MyJwtPayload;
+    const updateUser = await UserService.updateUser(body,decodedUser.userId)
+    sendResponse(res,{
+            success: true,
+            message: "Your info updated successfully",
+            data: updateUser,
+            statusCode: res.statusCode,
+        })
+  
+})
+
+
 
 export const UserController = {
     createUser,
     getAllUser,
-    agentApprove
+    agentApprove,
+    getMe,
+    editProfile
 }

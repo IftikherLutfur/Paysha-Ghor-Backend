@@ -8,6 +8,7 @@ const user_interface_1 = require("../user/user.interface");
 const zodValidation_1 = require("../../middleware/zodValidation");
 const wallet_validation_1 = require("./wallet.validation");
 const wallet = (0, express_1.Router)();
+wallet.post("/", (0, auth_1.checkAuth)(user_interface_1.Role.ADMIN), wallet_controller_1.WalletController.getAllWallet);
 wallet.post("/deposite", (0, auth_1.checkAuth)(user_interface_1.Role.USER), (0, zodValidation_1.zodValidation)(wallet_validation_1.transactionValidation), wallet_controller_1.WalletController.depositeByUser);
 wallet.post("/sendMoney", (0, auth_1.checkAuth)(user_interface_1.Role.USER), (0, zodValidation_1.zodValidation)(wallet_validation_1.transactionValidation), wallet_controller_1.WalletController.sendMoney);
 wallet.post("/withdraw", (0, auth_1.checkAuth)(user_interface_1.Role.USER), (0, zodValidation_1.zodValidation)(wallet_validation_1.transactionValidation), wallet_controller_1.WalletController.withdraw);

@@ -20,3 +20,9 @@ export interface IUser{
     role: Role,
     userStatus?:UserStatus;
 }
+export interface IUserUpdate{
+    name?:string;
+    email?:string;
+    currentPassword: string
+    newPassword?:string;
+}

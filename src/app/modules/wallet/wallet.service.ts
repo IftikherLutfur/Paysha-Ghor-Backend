@@ -123,6 +123,7 @@ const sendMoney = async (payload: Partial<ITransaction>, userId: string) => {
 
 }
 
+
 const withdrawByUser = async (amount: number, userId: string) => {
 
     // find wallet
@@ -169,7 +170,7 @@ const cashInMoney = async (payload: Partial<ITransaction>, userId: string) => {
     // Validate sender (agent)
     const sender = await Wallet.findOne({userId: userId});
     if (!sender) {
-        throw new Error("Sender wallet not found");
+        throw new Error("Sender walletsss not found");
     }
 
     const senderUser = await User.findById(userId)

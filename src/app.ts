@@ -1,14 +1,20 @@
 import express, { Application, Request, Response } from "express"
+import cookieParser from "cookie-parser";
 import { userRoute } from "./app/modules/user/user.route"
 import { authRouter } from "./app/modules/auth/auth.route"
 import { walletRoute } from "./app/modules/wallet/wallet.route"
+import cors from "cors"
 const app: Application = express()
 
+app.use(cors({
+  origin: "http://localhost:3000",  // frontend URL
+  credentials: true,                // cookie পাঠানোর জন্য
+}));
 app.use(express.json())
+app.use(cookieParser());
 app.use("/api/user", userRoute)
 app.use("/api/auth", authRouter)
 app.use("/api/wallet", walletRoute)
-
 app.get("/", async (req: Request, res: Response) => {
   res.send("Welcome to Poysha Ghor API")
 

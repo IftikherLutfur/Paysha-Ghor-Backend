@@ -16,9 +16,7 @@ const loginUser = async (payload: Partial<IUser>) => {
         return null;
     }
 
-    console.log("Checking password...");
     const isMatch = await bcryptjs.compare(password, user.password as string);
-    console.log("isMatch:", isMatch);
 
     if (!isMatch) {
         console.log("Password did not match");

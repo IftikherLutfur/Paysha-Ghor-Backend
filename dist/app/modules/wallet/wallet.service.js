@@ -33,6 +33,10 @@ const walletCreate = (payload, userId) => __awaiter(void 0, void 0, void 0, func
     const walletWithUser = yield wallet_model_1.Wallet.findById(wallet._id).populate('userId');
     return walletWithUser;
 });
+const allWallets = () => __awaiter(void 0, void 0, void 0, function* () {
+    const wallets = yield wallet_model_1.Wallet.find({});
+    return wallets;
+});
 // pop-up
 const deposite = (userId, amount) => __awaiter(void 0, void 0, void 0, function* () {
     const wallet = yield wallet_model_1.Wallet.findOne({ userId });
@@ -231,6 +235,7 @@ const changeWalletStatus = (walletId, payload) => __awaiter(void 0, void 0, void
 });
 exports.WalletService = {
     walletCreate,
+    allWallets,
     deposite,
     sendMoney,
     withdrawByUser,
