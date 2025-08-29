@@ -27,6 +27,7 @@ const userCreate = async (payload: IUser) => {
     password: hashedPassword,
     role: payload.role,
     ...(payload.role === "AGENT" && { userStatus: UserStatus.PENDING }),
+    ...(payload.role === "USER" && { userStatus: UserStatus.ACTIVE }),
   });
 
   // Auto-create wallet with initial balance (e.g., 50)
@@ -43,7 +44,7 @@ const userCreate = async (payload: IUser) => {
 const getMe = async (userId: String) => {
   const getUser = await User.findById(userId).select("-password")
   return getUser;
-}
+};
 
 const findAllUser = async () => {
   const findAll = await User.find({})
@@ -64,9 +65,24 @@ const agentApprove = async (agentId: string, payload: IUser) => {
   if (!agent) {
     throw new Error("Failed to update agent")
   }
-
   return agent
 }
+
+
+const userStatusChange = async (payload: IUser, userId: string) => {
+  const isUserExist = await User.findById(userId)
+  if (!isUserExist) {
+    throw new Error("This user is not exist")
+  }
+
+  const userStatus = await User.findByIdAndUpdate(
+    userId,
+    { userStatus: payload.userStatus },
+    { new: true, runValidators: true }
+  )
+  return userStatus;
+}
+
 
 const updateUser = async (payload: IUserUpdate, userId: string) => {
   const { name, email, currentPassword, newPassword } = payload;
@@ -102,11 +118,11 @@ const updateUser = async (payload: IUserUpdate, userId: string) => {
   return update;
 };
 
-
 export const UserService = {
   userCreate,
   findAllUser,
   agentApprove,
   getMe,
-  updateUser
+  updateUser,
+  userStatusChange
 }

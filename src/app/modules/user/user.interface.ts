@@ -9,7 +9,9 @@ export enum Role {
 export enum UserStatus{
     APPROVED = "APPROVED",
     PENDING = "PENDING",
-    SUSPEND = "SUSPEND"
+    SUSPEND = "SUSPEND",
+    BLOCK = "BLOCK",
+    ACTIVE = "ACTIVE"
 }
 
 export interface IUser{

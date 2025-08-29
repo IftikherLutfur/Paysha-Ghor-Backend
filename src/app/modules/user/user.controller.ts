@@ -97,6 +97,18 @@ const editProfile = catchAsync(async(req:Request, res:Response)=>{
   
 })
 
+const userStatusChange = catchAsync(async(req:Request, res:Response)=>{
+  const body = req.body;
+  const {userId} = req.params;
+
+  const data = await UserService.userStatusChange(body, userId)
+  sendResponse(res,{
+            success: true,
+            message: "User status change successfully",
+            data: data,
+            statusCode: res.statusCode,
+        })
+})
 
 
 export const UserController = {
@@ -104,5 +116,6 @@ export const UserController = {
     getAllUser,
     agentApprove,
     getMe,
-    editProfile
+    editProfile,
+    userStatusChange
 }
