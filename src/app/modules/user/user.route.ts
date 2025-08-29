@@ -14,4 +14,4 @@ user.patch("/edit-profile", checkAuth(...Object.values(Role)), UserController.ed
 user.patch("/userStatus/:userId", checkAuth(Role.ADMIN), UserController.userStatusChange)
 user.patch("/agent-approve/:agentId", checkAuth(Role.ADMIN), UserController.agentApprove)
 
-export const userRoute = user;
+export const userRoute = user;  
