@@ -12,4 +12,6 @@ var UserStatus;
     UserStatus["APPROVED"] = "APPROVED";
     UserStatus["PENDING"] = "PENDING";
     UserStatus["SUSPEND"] = "SUSPEND";
+    UserStatus["BLOCK"] = "BLOCK";
+    UserStatus["ACTIVE"] = "ACTIVE";
 })(UserStatus || (exports.UserStatus = UserStatus = {}));

@@ -34,7 +34,7 @@ const userCreate = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         throw new Error("User already exist");
     }
     const hashedPassword = yield bcryptjs_1.default.hash(payload.password, 10);
-    const user = yield user_model_1.User.create(Object.assign({ email: payload.email, password: hashedPassword, role: payload.role }, (payload.role === "AGENT" && { userStatus: user_interface_1.UserStatus.PENDING })));
+    const user = yield user_model_1.User.create(Object.assign(Object.assign({ email: payload.email, password: hashedPassword, role: payload.role }, (payload.role === "AGENT" && { userStatus: user_interface_1.UserStatus.PENDING })), (payload.role === "USER" && { userStatus: user_interface_1.UserStatus.ACTIVE })));
     // Auto-create wallet with initial balance (e.g., 50)
     yield wallet_service_1.WalletService.walletCreate({
         userId: user._id,
@@ -44,20 +44,64 @@ const userCreate = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     }, user._id.toString());
     return user;
 });
+const getMe = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const getUser = yield user_model_1.User.findById(userId).select("-password");
+    return getUser;
+});
 const findAllUser = () => __awaiter(void 0, void 0, void 0, function* () {
     const findAll = yield user_model_1.User.find({});
     return findAll;
 });
 const agentApprove = (agentId, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const isAgent = yield user_model_1.User.findById(agentId);
-    if ((isAgent === null || isAgent === void 0 ? void 0 : isAgent.role) !== user_interface_1.Role.AGENT) {
+    if (!isAgent || isAgent.role !== user_interface_1.Role.AGENT) {
         throw new Error("Agent not found");
     }
-    const agent = yield user_model_1.User.findByIdAndUpdate({ _id: agentId }, { $set: { userStatus: payload.userStatus } }, { new: true, runValidators: true });
+    const agent = yield user_model_1.User.findByIdAndUpdate(agentId, { userStatus: payload.userStatus }, // $set optional in Mongoose
+    { new: true, runValidators: true });
+    if (!agent) {
+        throw new Error("Failed to update agent");
+    }
     return agent;
+});
+const userStatusChange = (payload, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const isUserExist = yield user_model_1.User.findById(userId);
+    if (!isUserExist) {
+        throw new Error("This user is not exist");
+    }
+    const userStatus = yield user_model_1.User.findByIdAndUpdate(userId, { userStatus: payload.userStatus }, { new: true, runValidators: true });
+    return userStatus;
+});
+const updateUser = (payload, userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const { name, email, currentPassword, newPassword } = payload;
+    const isUserExist = yield user_model_1.User.findById(userId);
+    if (!isUserExist) {
+        throw new Error("User not found");
+    }
+    // Step 1: সবসময় currentPassword মিলছে কিনা চেক করবে
+    const isMatch = yield bcryptjs_1.default.compare(currentPassword, isUserExist.password);
+    if (!isMatch) {
+        throw new Error("Current password is incorrect, update cancelled!");
+    }
+    let hashedPassword = isUserExist.password;
+    if (newPassword) {
+        hashedPassword = yield bcryptjs_1.default.hash(newPassword, 10);
+    }
+    // Step 4: updateData বানানো
+    const updateData = {};
+    if (name)
+        updateData.name = name;
+    if (email)
+        updateData.email = email;
+    updateData.password = hashedPassword;
+    const update = yield user_model_1.User.findByIdAndUpdate(userId, { $set: updateData }, { new: true, runValidators: true });
+    return update;
 });
 exports.UserService = {
     userCreate,
     findAllUser,
-    agentApprove
+    agentApprove,
+    getMe,
+    updateUser,
+    userStatusChange
 };

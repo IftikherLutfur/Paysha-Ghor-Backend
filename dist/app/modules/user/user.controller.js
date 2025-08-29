@@ -33,6 +33,17 @@ const createUser = (0, catchAsymc_1.catchAsync)((req, res, next) => __awaiter(vo
         });
     }
 }));
+const getMe = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const decodedUser = req.user;
+    console.log("Decoded from middleware:", decodedUser);
+    const getMyAccount = yield user_service_1.UserService.getMe(decodedUser.userId);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        message: "Your info retrieved",
+        data: getMyAccount,
+        statusCode: res.statusCode,
+    });
+}));
 const getAllUser = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const findAllUser = yield user_service_1.UserService.findAllUser();
@@ -55,8 +66,8 @@ const getAllUser = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, 
 const agentApprove = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { agentId } = req.params;
-        const payload = req.body;
-        const user = yield user_service_1.UserService.agentApprove(agentId, payload);
+        const body = req.body; // ✅ এখন destructure safe
+        const user = yield user_service_1.UserService.agentApprove(agentId, body);
         (0, sendResponse_1.sendResponse)(res, {
             success: true,
             message: "Agent approved successfully",
@@ -73,8 +84,34 @@ const agentApprove = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0
         });
     }
 }));
+const editProfile = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const body = req.body;
+    console.log(body);
+    const decodedUser = req.user;
+    const updateUser = yield user_service_1.UserService.updateUser(body, decodedUser.userId);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        message: "Your info updated successfully",
+        data: updateUser,
+        statusCode: res.statusCode,
+    });
+}));
+const userStatusChange = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const body = req.body;
+    const { userId } = req.params;
+    const data = yield user_service_1.UserService.userStatusChange(body, userId);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        message: "User status change successfully",
+        data: data,
+        statusCode: res.statusCode,
+    });
+}));
 exports.UserController = {
     createUser,
     getAllUser,
-    agentApprove
+    agentApprove,
+    getMe,
+    editProfile,
+    userStatusChange
 };

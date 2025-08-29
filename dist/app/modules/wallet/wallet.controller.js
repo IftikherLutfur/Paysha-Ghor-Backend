@@ -25,13 +25,13 @@ const getAllWallet = (req, res) => __awaiter(void 0, void 0, void 0, function* (
 // pop-up
 const depositeByUser = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const userId = req.user._id;
+        const userId = req.user;
         const { amount } = req.body;
         const payload = req.body;
         if (!amount || amount <= 0) {
             throw new Error("A valid amount is required");
         }
-        const popUp = yield wallet_service_1.WalletService.deposite(userId, Number(amount));
+        const popUp = yield wallet_service_1.WalletService.deposite(userId.userId, Number(amount));
         (0, sendResponse_1.sendResponse)(res, {
             success: true,
             message: "Money has been deposited",
@@ -45,8 +45,8 @@ const depositeByUser = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void
 }));
 const sendMoney = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const payload = req.body;
-    const userId = req.user._id;
-    const send = yield wallet_service_1.WalletService.sendMoney(payload, userId);
+    const userId = req.user;
+    const send = yield wallet_service_1.WalletService.sendMoney(payload, userId.userId);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         message: "Money send successfully",
@@ -57,8 +57,8 @@ const sendMoney = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, v
 // cashin by agent
 const cashIn = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const payload = req.body;
-    const userId = req.user._id;
-    const result = yield wallet_service_1.WalletService.cashInMoney(payload, userId);
+    const userId = req.user;
+    const result = yield wallet_service_1.WalletService.cashInMoney(payload, userId.userId);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         message: "Cashin Successful",
@@ -68,8 +68,8 @@ const cashIn = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void
 }));
 const cashout = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const payload = req.body;
-    const userId = req.user._id;
-    const cashInByAgent = yield wallet_service_1.WalletService.cashoutMoney(payload, userId);
+    const userId = req.user;
+    const cashInByAgent = yield wallet_service_1.WalletService.cashoutMoney(payload, userId.userId);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         message: "Cashout Successful",
@@ -79,8 +79,8 @@ const cashout = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, voi
 }));
 const withdraw = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const payload = req.body;
-    const userId = req.user._id;
-    const withdraw = yield wallet_service_1.WalletService.withdrawByUser(payload.amount, userId); // ✅ only pass amount and userId
+    const userId = req.user;
+    const withdraw = yield wallet_service_1.WalletService.withdrawByUser(payload.amount, userId.userId); // ✅ only pass amount and userId
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         message: "Successfully cashout",

@@ -14,23 +14,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.checkAuth = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const jwt_1 = require("../utils/jwt");
 dotenv_1.default.config();
 const checkAuth = (...authRoles) => {
     return (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+        var _a;
         try {
-            const token = req.headers.authorization;
+            const token = req.headers.authorization || ((_a = req.cookies) === null || _a === void 0 ? void 0 : _a.accessToken);
             if (!token) {
                 throw new Error("No token received");
             }
-            const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET_TOKEN);
-            // Inject user info into req.user
+            const decoded = (0, jwt_1.verifyToken)(token, process.env.JWT_SECRET_TOKEN);
+            // inject user into req
             req.user = {
-                _id: decoded.userId,
+                userId: decoded.userId,
                 email: decoded.email,
                 role: decoded.role,
             };
-            // Optional: Role check (if you pass roles to checkAuth())
+            // Role check (optional)
             if (authRoles.length && !authRoles.includes(decoded.role || "")) {
                 throw new Error("Forbidden: You are not authorized");
             }

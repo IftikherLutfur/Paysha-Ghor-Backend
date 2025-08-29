@@ -147,7 +147,7 @@ const cashInMoney = (payload, userId) => __awaiter(void 0, void 0, void 0, funct
     // Validate sender (agent)
     const sender = yield wallet_model_1.Wallet.findOne({ userId: userId });
     if (!sender) {
-        throw new Error("Sender wallet not found");
+        throw new Error("Sender walletsss not found");
     }
     const senderUser = yield user_model_1.User.findById(userId);
     // ✅ sender must be an AGENT

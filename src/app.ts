@@ -7,7 +7,7 @@ import cors from "cors"
 const app: Application = express()
 
 app.use(cors({
-  origin: "http://localhost:3000",  // frontend URL
+  origin: "https://paysha-ghor.vercel.app",  // frontend URL
   credentials: true,                // cookie পাঠানোর জন্য
 }));
 app.use(express.json())

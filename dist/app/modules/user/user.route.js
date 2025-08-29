@@ -10,5 +10,8 @@ const user_interface_1 = require("./user.interface");
 const user = (0, express_1.Router)();
 user.post("/", (0, zodValidation_1.zodValidation)(user_validation_1.userZodValidation), user_controller_1.UserController.createUser);
 user.get("/", (0, auth_1.checkAuth)(user_interface_1.Role.ADMIN), user_controller_1.UserController.getAllUser);
+user.get("/me", (0, auth_1.checkAuth)(...Object.values(user_interface_1.Role)), user_controller_1.UserController.getMe);
+user.patch("/edit-profile", (0, auth_1.checkAuth)(...Object.values(user_interface_1.Role)), user_controller_1.UserController.editProfile);
+user.patch("/userStatus/:userId", (0, auth_1.checkAuth)(user_interface_1.Role.ADMIN), user_controller_1.UserController.userStatusChange);
 user.patch("/agent-approve/:agentId", (0, auth_1.checkAuth)(user_interface_1.Role.ADMIN), user_controller_1.UserController.agentApprove);
 exports.userRoute = user;

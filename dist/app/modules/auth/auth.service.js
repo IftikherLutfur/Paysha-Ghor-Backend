@@ -26,9 +26,7 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         console.log("User not found");
         return null;
     }
-    console.log("Checking password...");
     const isMatch = yield bcryptjs_1.default.compare(password, user.password);
-    console.log("isMatch:", isMatch);
     if (!isMatch) {
         console.log("Password did not match");
         return null;
