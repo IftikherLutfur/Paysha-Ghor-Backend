@@ -42,14 +42,14 @@ const loginWithCredential = (req, res) => __awaiter(void 0, void 0, void 0, func
 const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.clearCookie("accessToken", {
         httpOnly: true,
-        secure: false,
-        sameSite: "lax"
+        secure: true,
+        sameSite: "none"
     });
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         message: "Logout successful",
         data: null,
-        statusCode: res.statusCode
+        statusCode: 200
     });
 });
 exports.AuthController = {
