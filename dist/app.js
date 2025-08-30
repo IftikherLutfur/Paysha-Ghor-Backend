@@ -21,7 +21,7 @@ const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
 // "https://paysha-ghor.vercel.app"
 app.use((0, cors_1.default)({
-    origin: "http://localhost:3000", // frontend URL
+    origin: "https://paysha-ghor.vercel.app", // frontend URL
     credentials: true, // cookie পাঠানোর জন্য
 }));
 app.use(express_1.default.json());

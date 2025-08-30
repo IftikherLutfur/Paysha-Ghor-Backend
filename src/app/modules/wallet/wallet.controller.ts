@@ -5,8 +5,9 @@ import { catchAsync } from "../../utils/catchAsymc";
 import { MyJwtPayload } from "../../utils/jwt";
 
 
-const getAllWallet = async(req:Request, res:Response)=>{
-   const wallets = await WalletService.allWallets()
+const getAllWallet = catchAsync(async(req:Request, res:Response)=>{
+    const {userId} = req.user as MyJwtPayload
+   const wallets = await WalletService.allWallets(userId)
    sendResponse(res,{
     success: true,
     message:"All wallets retrived",
@@ -14,7 +15,7 @@ const getAllWallet = async(req:Request, res:Response)=>{
     data: wallets
     
    })
-}
+})
 
 // pop-up
 const depositeByUser = catchAsync(async (req: Request, res: Response) => {

@@ -5,10 +5,9 @@ import { authRouter } from "./app/modules/auth/auth.route"
 import { walletRoute } from "./app/modules/wallet/wallet.route"
 import cors from "cors"
 const app: Application = express()
-// "https://paysha-ghor.vercel.app"
 app.use(cors({
-  origin: "https://paysha-ghor.vercel.app",  // frontend URL
-  credentials: true,                // cookie পাঠানোর জন্য
+  origin: "https://paysha-ghor.vercel.app", 
+  credentials: true,                
 }));
 app.use(express.json())
 app.use(cookieParser());

@@ -7,7 +7,7 @@ import { transactionValidation, walletValidation } from "./wallet.validation";
 
 const wallet = Router();
 
-wallet.post("/",checkAuth(Role.ADMIN), WalletController.getAllWallet)
+wallet.get("/",checkAuth(Role.ADMIN), WalletController.getAllWallet)
 wallet.post("/deposite",checkAuth(Role.USER), zodValidation(transactionValidation), WalletController.depositeByUser)
 wallet.post("/sendMoney", checkAuth(Role.USER), zodValidation(transactionValidation), WalletController.sendMoney)
 wallet.post("/withdraw", checkAuth(Role.USER), zodValidation(transactionValidation), WalletController.withdraw)
@@ -16,6 +16,6 @@ wallet.post("/cash-out", checkAuth(Role.AGENT), zodValidation(transactionValidat
 wallet.get("/transaction", checkAuth(Role.ADMIN), WalletController.getAllTransaction)
 wallet.get("/:id", checkAuth(Role.AGENT, Role.USER), WalletController.getIndividualWallet);
 wallet.get("/transaction/:id", checkAuth(Role.AGENT, Role.USER), WalletController.getIndividualTransaction);
-wallet.patch("/:id", checkAuth(Role.ADMIN), WalletController.changeWalletStatus)
+wallet.patch("/changeStatus/:id", checkAuth(Role.ADMIN), WalletController.changeWalletStatus)
 
 export const walletRoute = wallet; 

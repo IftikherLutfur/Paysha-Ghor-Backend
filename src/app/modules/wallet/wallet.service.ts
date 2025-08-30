@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { User } from "../user/user.model";
 import { IPaymentType, ITransaction, IType, IWallet, Wallet_Status } from "./wallet.interface";
 import { Transaction, Wallet } from "./wallet.model";
-import { Role, UserStatus } from "../user/user.interface";
+import { IUser, Role, UserStatus } from "../user/user.interface";
 
 const walletCreate = async (payload: Partial<IWallet>, userId: string) => {
     // 1 jon user er 2 ta wallet jate khulte na pare
@@ -25,10 +25,20 @@ const walletCreate = async (payload: Partial<IWallet>, userId: string) => {
     return walletWithUser
 }
 
-const allWallets = async() =>{
-    const wallets = await Wallet.find({})
+const allWallets = async(userId: string) => {
+    const user = await User.findById(userId);
+
+    if (!user) {
+        throw new Error("User not found");
+    }
+
+    if (user.role !== "ADMIN") {
+        throw new Error("Forbidden: Only admins can view all wallets");
+    }
+
+    const wallets = await Wallet.find({});
     return wallets;
-}
+};
 
 // pop-up
 const deposite = async (userId: string, amount: number) => {
