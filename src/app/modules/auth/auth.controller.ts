@@ -47,15 +47,15 @@ const loginWithCredential = async (req: Request, res: Response) => {
 const logout = async (req:Request, res:Response)=>{
   res.clearCookie("accessToken",{
     httpOnly: true,
-    secure: false,
-    sameSite: "lax"
+    secure: true,
+    sameSite: "none"
   })
 
   sendResponse(res, {
     success: true,
     message:"Logout successful",
     data: null,
-    statusCode: res.statusCode
+    statusCode: 200
   })
 }
 
