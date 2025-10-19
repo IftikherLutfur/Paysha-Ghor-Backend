@@ -35,7 +35,7 @@ const createUser = (0, catchAsymc_1.catchAsync)((req, res, next) => __awaiter(vo
 }));
 const getMe = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const decodedUser = req.user;
-    console.log("Decoded from middleware:", decodedUser);
+    
     const getMyAccount = yield user_service_1.UserService.getMe(decodedUser.userId);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,

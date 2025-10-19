@@ -23,11 +23,15 @@ const userCreate = async (payload: IUser) => {
   const hashedPassword = await bcryptjs.hash(payload.password, 10);
 
   const user = await User.create({
+    name: payload.name,
     email: payload.email,
     password: hashedPassword,
+    profilePhoto: payload.profilePhoto,
+    phone: payload.phone,
     role: payload.role,
     ...(payload.role === "AGENT" && { userStatus: UserStatus.PENDING }),
     ...(payload.role === "USER" && { userStatus: UserStatus.ACTIVE }),
+
   });
 
   // Auto-create wallet with initial balance (e.g., 50)
@@ -49,6 +53,42 @@ const getMe = async (userId: String) => {
 const findAllUser = async () => {
   const findAll = await User.find({})
   return findAll;
+}
+
+const userAndAgent = async (page: number, limit: number) => {
+
+  const parsedLimit = Number(limit)
+  const parsedPage = Number(page)
+  const skip = (parsedPage - 1) * parsedLimit
+
+  const agentUser = await User.find({
+    role: { $in: [Role.USER, Role.AGENT] }
+  }).skip(skip).limit(parsedLimit)
+
+  const total = await User.countDocuments({
+    role: { $in: [Role.AGENT, Role.USER] }
+  })
+
+  return {
+    data: agentUser,
+    meta: {
+      total,
+      page: parsedPage,
+      lkmit: parsedLimit,
+      totalPages: Math.ceil(total / parsedLimit)
+    }
+  }
+}
+
+const userAndAgentById = async (id: string) => {
+  const agentUser = await User.find({
+    role: { $in: [Role.USER, Role.AGENT] }
+  })
+  if (!agentUser) {
+    throw new Error("You are not authorized to get this user information")
+  }
+  const getById = await User.findById(id)
+  return getById;
 }
 
 const agentApprove = async (agentId: string, payload: IUser) => {
@@ -121,6 +161,8 @@ const updateUser = async (payload: IUserUpdate, userId: string) => {
 export const UserService = {
   userCreate,
   findAllUser,
+  userAndAgentById,
+  userAndAgent,
   agentApprove,
   getMe,
   updateUser,

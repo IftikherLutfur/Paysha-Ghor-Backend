@@ -13,15 +13,16 @@ exports.WalletController = void 0;
 const sendResponse_1 = require("../../utils/sendResponse");
 const wallet_service_1 = require("./wallet.service");
 const catchAsymc_1 = require("../../utils/catchAsymc");
-const getAllWallet = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const wallets = yield wallet_service_1.WalletService.allWallets();
+const getAllWallet = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { userId } = req.user;
+    const wallets = yield wallet_service_1.WalletService.allWallets(userId);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         message: "All wallets retrived",
         statusCode: res.statusCode,
         data: wallets
     });
-});
+}));
 // pop-up
 const depositeByUser = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {

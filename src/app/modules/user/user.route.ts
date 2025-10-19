@@ -9,6 +9,8 @@ const user = Router()
 
 user.post("/", zodValidation(userZodValidation), UserController.createUser)
 user.get("/", checkAuth(Role.ADMIN), UserController.getAllUser)
+user.get("/userAndAgent", UserController.getUserAndAgent)
+user.get("/userAndAgent/:id", UserController.getUserAndAgentById)
 user.get("/me", checkAuth(...Object.values(Role)), UserController.getMe)
 user.patch("/edit-profile", checkAuth(...Object.values(Role)), UserController.editProfile)
 user.patch("/userStatus/:userId", checkAuth(Role.ADMIN), UserController.userStatusChange)

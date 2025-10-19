@@ -8,9 +8,7 @@ export const checkAuth = (...authRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       const token =
-        req.headers.authorization || (req.cookies?.accessToken as string);
-      
-
+        req.headers.authorization || (req.cookies?.accessToken as string)
       if (!token) {
         throw new Error("No token received");
       }

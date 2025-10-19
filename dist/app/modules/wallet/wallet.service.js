@@ -33,7 +33,14 @@ const walletCreate = (payload, userId) => __awaiter(void 0, void 0, void 0, func
     const walletWithUser = yield wallet_model_1.Wallet.findById(wallet._id).populate('userId');
     return walletWithUser;
 });
-const allWallets = () => __awaiter(void 0, void 0, void 0, function* () {
+const allWallets = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.User.findById(userId);
+    if (!user) {
+        throw new Error("User not found");
+    }
+    if (user.role !== "ADMIN") {
+        throw new Error("Forbidden: Only admins can view all wallets");
+    }
     const wallets = yield wallet_model_1.Wallet.find({});
     return wallets;
 });

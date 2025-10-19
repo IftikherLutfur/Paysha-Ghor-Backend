@@ -19,10 +19,9 @@ const auth_route_1 = require("./app/modules/auth/auth.route");
 const wallet_route_1 = require("./app/modules/wallet/wallet.route");
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
-// "https://paysha-ghor.vercel.app"
 app.use((0, cors_1.default)({
-    origin: "https://paysha-ghor.vercel.app", // frontend URL
-    credentials: true, // cookie পাঠানোর জন্য
+    origin: "https://paysha-ghor.vercel.app",
+    credentials: true,
 }));
 app.use(express_1.default.json());
 app.use((0, cookie_parser_1.default)());

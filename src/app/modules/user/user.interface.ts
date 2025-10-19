@@ -16,15 +16,19 @@ export enum UserStatus{
 
 export interface IUser{
     _id: Types.ObjectId;
-    name?:string;
+    name:string;
     email:string;
     password:string;
-    role: Role,
+    profilePhoto: string
+    phone: string
+    role: Role;
     userStatus?:UserStatus;
 }
 export interface IUserUpdate{
     name?:string;
     email?:string;
-    currentPassword: string
+    profilePhoto?: string;
+    phone?: string
+    currentPassword: string;
     newPassword?:string;
 }
