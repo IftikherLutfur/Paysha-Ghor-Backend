@@ -3,6 +3,7 @@ import { Types } from "mongoose";
 export enum IType {
     USER="USER",
     AGENT="AGENT",
+    ADMIN="ADMIN"
 }
 
 export enum Wallet_Status{
@@ -34,4 +35,10 @@ export interface ITransaction {
     amount?:number;
     type?:IPaymentType;
     initiate?: Types.ObjectId;
+}
+
+export interface IFinance{
+    sendMoney?:number;
+    cashOut?: number;
+    profit?: number;
 }

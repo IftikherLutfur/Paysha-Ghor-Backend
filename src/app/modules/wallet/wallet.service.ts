@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { User } from "../user/user.model";
 import { IPaymentType, ITransaction, IType, IWallet, Wallet_Status } from "./wallet.interface";
-import { Transaction, Wallet } from "./wallet.model";
+import { Finance, Transaction, Wallet } from "./wallet.model";
 import { IUser, Role, UserStatus } from "../user/user.interface";
 
 const walletCreate = async (payload: Partial<IWallet>, userId: string) => {
@@ -25,7 +25,7 @@ const walletCreate = async (payload: Partial<IWallet>, userId: string) => {
     return walletWithUser
 }
 
-const allWallets = async(userId: string) => {
+const allWallets = async (userId: string) => {
     const user = await User.findById(userId);
 
     if (!user) {
@@ -178,7 +178,7 @@ const cashInMoney = async (payload: Partial<ITransaction>, userId: string) => {
     }
 
     // Validate sender (agent)
-    const sender = await Wallet.findOne({userId: userId});
+    const sender = await Wallet.findOne({ userId: userId });
     if (!sender) {
         throw new Error("Sender walletsss not found");
     }
@@ -232,30 +232,61 @@ const cashInMoney = async (payload: Partial<ITransaction>, userId: string) => {
 };
 
 
-// cashout by agent
-const cashoutMoney = async (payload: Partial<ITransaction>, userEmail: string) => {
-    const { from, amount } = payload
-    const sender = await Wallet.findOne({ userId: from })
-    if (!sender) {
-        throw new Error("This user doesn't exist")
-    }
-    if (sender?.walletStatus === Wallet_Status.BLOCK) {
-        throw new Error("This wallet is block")
-    }
-    if (typeof amount !== "number" || isNaN(amount)) {
-        throw new Error("Amount should be valid number")
-    }
-    sender.balance = sender.balance - amount;
-    sender.save()
+const cashoutMoney = async (payload: Partial<ITransaction>, user: any) => {
+  const { amount, to } = payload;
 
-    const createTransaction = await Transaction.create({
-        from: sender,
-        amount: amount,
-        type: IPaymentType.AGENT_CASHOUT,
-        initiate: userEmail
-    })
-    return createTransaction;
-}
+  const admin = await Wallet.findOne({walletType: IType.ADMIN})
+  const sender = await Wallet.findOne({ userId: user.userId });
+  const agent = await Wallet.findOne({ userId: to });
+
+  if (!sender) throw new Error("Sender not found");
+  if (!agent) throw new Error("Agent not found");
+  if (!admin) throw new Error("Agent not found");
+
+  if (sender.walletStatus === Wallet_Status.BLOCK) {
+    throw new Error("Sender wallet is blocked");
+  }
+
+  if (agent.walletStatus === Wallet_Status.BLOCK) {
+    throw new Error("Agent wallet is blocked");
+  }
+
+  if (typeof amount !== "number" || isNaN(amount) || amount <= 0) {
+    throw new Error("Amount should be a valid positive number");
+  }
+
+  const userFee = amount + (amount * 10) / 1000; // 10% fee
+  const agentCommission = (amount * 7) / 1000;   // 7% for agent
+  const adminCommission = (amount * 3) / 1000;   // 3% for admin
+  console.log(adminCommission)
+
+  if (sender.balance < userFee) {
+    throw new Error("Insufficient balance");
+  }
+
+  // Update balances
+  sender.balance -= userFee;
+  agent.balance += agentCommission;
+  admin.balance = admin?.balance + adminCommission
+
+  await sender.save();
+  await agent.save();
+  await admin.save();
+
+  // Save admin profit
+  
+
+  // Save transaction record
+  const createTransaction = await Transaction.create({
+    from: sender.userId,
+    to: to,
+    amount,
+    type: IPaymentType.AGENT_CASHOUT,
+    initiate: user.userEmail,
+  });
+
+  return createTransaction;
+};
 
 const getAllTransaction = async () => {
     const transaction = await Transaction.find({});

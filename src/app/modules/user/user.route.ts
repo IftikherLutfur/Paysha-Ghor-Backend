@@ -9,6 +9,7 @@ const user = Router()
 
 user.post("/", zodValidation(userZodValidation), UserController.createUser)
 user.get("/", checkAuth(Role.ADMIN), UserController.getAllUser)
+user.get("/finance", UserController.getAllUser)
 user.get("/userAndAgent", UserController.getUserAndAgent)
 user.get("/userAndAgent/:id", UserController.getUserAndAgentById)
 user.get("/me", checkAuth(...Object.values(Role)), UserController.getMe)

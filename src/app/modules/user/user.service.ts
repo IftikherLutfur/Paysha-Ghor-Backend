@@ -1,4 +1,5 @@
 import { IType, Wallet_Status } from "../wallet/wallet.interface";
+import { Finance, Wallet } from "../wallet/wallet.model";
 import { WalletService } from "../wallet/wallet.service";
 import { IUser, IUserUpdate, Role, UserStatus } from "./user.interface"
 import { User } from "./user.model"
@@ -10,6 +11,8 @@ const mapRoleToWalletType = (role: Role): IType => {
       return IType.USER;
     case Role.AGENT:
       return IType.AGENT;
+    case Role.ADMIN:
+      return IType.ADMIN;
     default:
       throw new Error("Invalid role for wallet type");
   }
@@ -19,6 +22,8 @@ const userCreate = async (payload: IUser) => {
   if (isExist) {
     throw new Error("User already exist");
   }
+
+  const isAdminWalletExist = await Wallet.find({walletType: IType.ADMIN})
 
   const hashedPassword = await bcryptjs.hash(payload.password, 10);
 
@@ -31,16 +36,27 @@ const userCreate = async (payload: IUser) => {
     role: payload.role,
     ...(payload.role === "AGENT" && { userStatus: UserStatus.PENDING }),
     ...(payload.role === "USER" && { userStatus: UserStatus.ACTIVE }),
+    ...(payload.role === "ADMIN" && { userStatus: UserStatus.ACTIVE }),
 
   });
 
+  let shouldCreateWallet = true;
+
+  if(payload.role === "ADMIN"){
+    if(isAdminWalletExist){
+      shouldCreateWallet = false;
+    }
+  }
+
   // Auto-create wallet with initial balance (e.g., 50)
-  await WalletService.walletCreate({
+  if(shouldCreateWallet) {
+    await WalletService.walletCreate({
     userId: user._id,
     balance: 50,       // initial balance
     walletType: mapRoleToWalletType(payload.role), // or "USER"/"AGENT" accordingly
     walletStatus: Wallet_Status.ACTIVE,
   }, user._id.toString());
+  }
 
   return user;
 };
@@ -56,29 +72,38 @@ const findAllUser = async () => {
 }
 
 const userAndAgent = async (page: number, limit: number) => {
+  const parsedLimit = Number(limit);
+  const parsedPage = Number(page);
+  const skip = (parsedPage - 1) * parsedLimit;
 
-  const parsedLimit = Number(limit)
-  const parsedPage = Number(page)
-  const skip = (parsedPage - 1) * parsedLimit
-
+  // ✅ Only USERs + APPROVED AGENTs
   const agentUser = await User.find({
-    role: { $in: [Role.USER, Role.AGENT] }
-  }).skip(skip).limit(parsedLimit)
+    $or: [
+      { role: Role.USER },
+      { role: Role.AGENT, userStatus: UserStatus.APPROVED }
+    ]
+  })
+    .skip(skip)
+    .limit(parsedLimit);
 
   const total = await User.countDocuments({
-    role: { $in: [Role.AGENT, Role.USER] }
-  })
+    $or: [
+      { role: Role.USER },
+      { role: Role.AGENT, userStatus: UserStatus.APPROVED }
+    ]
+  });
 
   return {
     data: agentUser,
     meta: {
       total,
       page: parsedPage,
-      lkmit: parsedLimit,
+      limit: parsedLimit, // ✅ corrected spelling
       totalPages: Math.ceil(total / parsedLimit)
     }
-  }
-}
+  };
+};
+
 
 const userAndAgentById = async (id: string) => {
   const agentUser = await User.find({
@@ -132,7 +157,6 @@ const updateUser = async (payload: IUserUpdate, userId: string) => {
     throw new Error("User not found");
   }
 
-  // Step 1: সবসময় currentPassword মিলছে কিনা চেক করবে
   const isMatch = await bcryptjs.compare(currentPassword, isUserExist.password);
   if (!isMatch) {
     throw new Error("Current password is incorrect, update cancelled!");
@@ -143,7 +167,6 @@ const updateUser = async (payload: IUserUpdate, userId: string) => {
     hashedPassword = await bcryptjs.hash(newPassword, 10);
   }
 
-  // Step 4: updateData বানানো
   const updateData: Partial<IUser> = {};
   if (name) updateData.name = name;
   if (email) updateData.email = email;
@@ -158,6 +181,11 @@ const updateUser = async (payload: IUserUpdate, userId: string) => {
   return update;
 };
 
+const finance = async () => {
+  const result = await Finance.find();
+  return result;
+}
+
 export const UserService = {
   userCreate,
   findAllUser,
@@ -166,5 +194,6 @@ export const UserService = {
   agentApprove,
   getMe,
   updateUser,
-  userStatusChange
+  userStatusChange,
+  finance
 }

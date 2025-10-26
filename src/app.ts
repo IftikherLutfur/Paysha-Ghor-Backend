@@ -6,8 +6,8 @@ import { walletRoute } from "./app/modules/wallet/wallet.route"
 import cors from "cors"
 const app: Application = express()
 app.use(cors({
-  // origin: "https://paysha-ghor.vercel.app", 
-  origin: "http://localhost:3000", 
+  origin: "https://paysha-ghor.vercel.app", 
+  // origin: "http://localhost:3000", 
   credentials: true,                
 }));
 app.use(express.json())

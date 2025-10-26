@@ -71,15 +71,19 @@ const cashIn = catchAsync(async (req: Request, res: Response) => {
 
 
 const cashout = catchAsync(async (req: Request, res: Response) => {
-    const payload = req.body;
-    const userId = req.user as MyJwtPayload;
-    const cashInByAgent = await WalletService.cashoutMoney(payload, userId.userId);
+   try {
+     const payload = req.body;
+    const userId = req.user as MyJwtPayload
+    const cashInByAgent = await WalletService.cashoutMoney(payload, userId);
     sendResponse(res, {
         success: true,
         message: "Cashout Successful",
         statusCode: res.statusCode,
         data: cashInByAgent
     })
+   } catch (error) {
+       console.log(error)
+   }
 })
 
 const withdraw = catchAsync(async (req: Request, res: Response) => {

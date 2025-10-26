@@ -32,3 +32,4 @@ export interface IUserUpdate{
     currentPassword: string;
     newPassword?:string;
 }
+

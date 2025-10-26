@@ -81,7 +81,7 @@ const getUserAndAgent = catchAsync(async (req: Request, res: Response) => {
 })
 const getUserAndAgentById = catchAsync(async (req: Request, res: Response) => {
   try {
-   const id = req.params.id;
+    const id = req.params.id;
     const findUser = await UserService.userAndAgentById(id)
     sendResponse(res, {
       success: true,
@@ -149,6 +149,16 @@ const userStatusChange = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
+const finance = catchAsync(async (req: Request, res: Response) => {
+        const getTheFinance = await UserService.finance();
+        sendResponse(res,{
+          success:true,
+          message:"Finance data retrived",
+          statusCode: 200,
+          data:getTheFinance
+        })
+})
+
 
 export const UserController = {
   createUser,
@@ -158,5 +168,6 @@ export const UserController = {
   agentApprove,
   getMe,
   editProfile,
-  userStatusChange
+  userStatusChange,
+  finance,
 }

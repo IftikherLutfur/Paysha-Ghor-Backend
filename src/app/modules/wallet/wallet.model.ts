@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import { IPaymentType, ITransaction, IType, IWallet, Wallet_Status } from "./wallet.interface";
+import { IFinance, IPaymentType, ITransaction, IType, IWallet, Wallet_Status } from "./wallet.interface";
 
 const walletSchema = new Schema<IWallet>({
     userId: { type: Schema.Types.ObjectId, required: true, ref: "User" },
@@ -24,6 +24,17 @@ const transactionSchema = new Schema<ITransaction>({
     }
 )
 
-export const Wallet = model<IWallet>("Wallet", walletSchema)
+const financeSchema = new Schema<IFinance>({
+    sendMoney: { type: Number },
+    cashOut: { type: Number },
+    profit: { type: Number }
+},
+{
+    timestamps:true,
+    versionKey:false
+}
+)
 
+export const Wallet = model<IWallet>("Wallet", walletSchema)
+export const Finance = model<IFinance>("Finance", financeSchema)
 export const Transaction = model<ITransaction>("Transaction", transactionSchema)
