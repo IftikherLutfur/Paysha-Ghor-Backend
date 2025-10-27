@@ -68,15 +68,20 @@ const cashIn = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void
     });
 }));
 const cashout = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const payload = req.body;
-    const userId = req.user;
-    const cashInByAgent = yield wallet_service_1.WalletService.cashoutMoney(payload, userId.userId);
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        message: "Cashout Successful",
-        statusCode: res.statusCode,
-        data: cashInByAgent
-    });
+    try {
+        const payload = req.body;
+        const userId = req.user;
+        const cashInByAgent = yield wallet_service_1.WalletService.cashoutMoney(payload, userId);
+        (0, sendResponse_1.sendResponse)(res, {
+            success: true,
+            message: "Cashout Successful",
+            statusCode: res.statusCode,
+            data: cashInByAgent
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
 }));
 const withdraw = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const payload = req.body;

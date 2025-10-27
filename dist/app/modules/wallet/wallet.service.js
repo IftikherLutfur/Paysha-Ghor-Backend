@@ -188,31 +188,54 @@ const cashInMoney = (payload, userId) => __awaiter(void 0, void 0, void 0, funct
     const transaction = yield wallet_model_1.Transaction.create({
         to: to,
         amount,
+        from: userId,
         type: wallet_interface_1.IPaymentType.AGENT_CASHIN,
         initiate: userId,
     });
     return transaction;
 });
-// cashout by agent
-const cashoutMoney = (payload, userEmail) => __awaiter(void 0, void 0, void 0, function* () {
-    const { from, amount } = payload;
-    const sender = yield wallet_model_1.Wallet.findOne({ userId: from });
-    if (!sender) {
-        throw new Error("This user doesn't exist");
+const cashoutMoney = (payload, user) => __awaiter(void 0, void 0, void 0, function* () {
+    const { amount, to } = payload;
+    const admin = yield wallet_model_1.Wallet.findOne({ walletType: wallet_interface_1.IType.ADMIN });
+    const sender = yield wallet_model_1.Wallet.findOne({ userId: user.userId });
+    const agent = yield wallet_model_1.Wallet.findOne({ userId: to });
+    if (!sender)
+        throw new Error("Sender not found");
+    if (!agent)
+        throw new Error("Agent not found");
+    if (!admin)
+        throw new Error("Agent not found");
+    if (sender.walletStatus === wallet_interface_1.Wallet_Status.BLOCK) {
+        throw new Error("Sender wallet is blocked");
     }
-    if ((sender === null || sender === void 0 ? void 0 : sender.walletStatus) === wallet_interface_1.Wallet_Status.BLOCK) {
-        throw new Error("This wallet is block");
+    if (agent.walletStatus === wallet_interface_1.Wallet_Status.BLOCK) {
+        throw new Error("Agent wallet is blocked");
     }
-    if (typeof amount !== "number" || isNaN(amount)) {
-        throw new Error("Amount should be valid number");
+    if (typeof amount !== "number" || isNaN(amount) || amount <= 0) {
+        throw new Error("Amount should be a valid positive number");
     }
-    sender.balance = sender.balance - amount;
-    sender.save();
+    const userFee = amount + (amount * 10) / 1000; // 10% fee
+    const agentCommission = (amount * 7) / 1000; // 7% for agent
+    const adminCommission = (amount * 3) / 1000; // 3% for admin
+    console.log(adminCommission);
+    if (sender.balance < userFee) {
+        throw new Error("Insufficient balance");
+    }
+    // Update balances
+    sender.balance -= userFee;
+    agent.balance += agentCommission;
+    admin.balance = (admin === null || admin === void 0 ? void 0 : admin.balance) + adminCommission;
+    yield sender.save();
+    yield agent.save();
+    yield admin.save();
+    // Save admin profit
+    // Save transaction record
     const createTransaction = yield wallet_model_1.Transaction.create({
-        from: sender,
-        amount: amount,
+        from: sender.userId,
+        to: to,
+        amount,
         type: wallet_interface_1.IPaymentType.AGENT_CASHOUT,
-        initiate: userEmail
+        initiate: user.userEmail,
     });
     return createTransaction;
 });

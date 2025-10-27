@@ -5,6 +5,47 @@ import { IUser, IUserUpdate, Role, UserStatus } from "./user.interface"
 import { User } from "./user.model"
 import bcryptjs from "bcryptjs";
 
+// const mapRoleToWalletType = (role: Role): IType => {
+//   switch (role) {
+//     case Role.USER:
+//       return IType.USER;
+//     case Role.AGENT:
+//       return IType.AGENT;
+//     default:
+//       throw new Error("Invalid role for wallet type");
+//   }
+// };
+// const userCreate = async (payload: IUser) => {
+//   const isExist = await User.findOne({ email: payload.email });
+//   if (isExist) {
+//     throw new Error("User already exist");
+//   }
+//   const hashedPassword = await bcryptjs.hash(payload.password, 10);
+
+//   const user = await User.create({
+//     name: payload.name,
+//     email: payload.email,
+//     password: hashedPassword,
+//     profilePhoto: payload.profilePhoto,
+//     phone: payload.phone,
+//     role: payload.role,
+//     ...(payload.role === "AGENT" && { userStatus: UserStatus.PENDING }),
+//     ...(payload.role === "USER" && { userStatus: UserStatus.ACTIVE }),
+
+//   });
+
+
+
+//   await WalletService.walletCreate({
+//     userId: user._id,
+//     balance:50,
+//     walletType: mapRoleToWalletType(payload.role),
+//     walletStatus: Wallet_Status.ACTIVE,
+//   }, user._id.toString());
+
+//   return user;
+// };
+
 const mapRoleToWalletType = (role: Role): IType => {
   switch (role) {
     case Role.USER:
@@ -17,13 +58,12 @@ const mapRoleToWalletType = (role: Role): IType => {
       throw new Error("Invalid role for wallet type");
   }
 };
+
 const userCreate = async (payload: IUser) => {
   const isExist = await User.findOne({ email: payload.email });
   if (isExist) {
     throw new Error("User already exist");
   }
-
-  const isAdminWalletExist = await Wallet.find({walletType: IType.ADMIN})
 
   const hashedPassword = await bcryptjs.hash(payload.password, 10);
 
@@ -34,32 +74,37 @@ const userCreate = async (payload: IUser) => {
     profilePhoto: payload.profilePhoto,
     phone: payload.phone,
     role: payload.role,
-    ...(payload.role === "AGENT" && { userStatus: UserStatus.PENDING }),
-    ...(payload.role === "USER" && { userStatus: UserStatus.ACTIVE }),
-    ...(payload.role === "ADMIN" && { userStatus: UserStatus.ACTIVE }),
-
+    userStatus:
+      payload.role === Role.AGENT ? UserStatus.PENDING : UserStatus.ACTIVE,
   });
 
-  let shouldCreateWallet = true;
+  // ✅ Check if Admin Wallet Already Exists
+  const adminHasWallet = await Wallet.findOne({
+    walletType: IType.ADMIN,
+  });
 
-  if(payload.role === "ADMIN"){
-    if(isAdminWalletExist){
-      shouldCreateWallet = false;
-    }
-  }
+  // ✅ Allow Wallet Creation If:
+  const shouldCreateWallet =
+    payload.role !== Role.ADMIN || !adminHasWallet;
 
-  // Auto-create wallet with initial balance (e.g., 50)
-  if(shouldCreateWallet) {
-    await WalletService.walletCreate({
-    userId: user._id,
-    balance: 50,       // initial balance
-    walletType: mapRoleToWalletType(payload.role), // or "USER"/"AGENT" accordingly
-    walletStatus: Wallet_Status.ACTIVE,
-  }, user._id.toString());
+  if (shouldCreateWallet) {
+    await WalletService.walletCreate(
+      {
+        userId: user._id,
+        balance: payload.role === Role.ADMIN ? 0 : 50,
+        walletType: mapRoleToWalletType(payload.role),
+        walletStatus: Wallet_Status.ACTIVE,
+
+        // ✅ Only agent gets profit field
+        ...(payload.role === Role.AGENT && { profit: 0 }),
+      },
+      user._id.toString()
+    );
   }
 
   return user;
 };
+
 
 const getMe = async (userId: String) => {
   const getUser = await User.findById(userId).select("-password")

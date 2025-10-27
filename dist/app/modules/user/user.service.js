@@ -14,16 +14,53 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserService = void 0;
 const wallet_interface_1 = require("../wallet/wallet.interface");
+const wallet_model_1 = require("../wallet/wallet.model");
 const wallet_service_1 = require("../wallet/wallet.service");
 const user_interface_1 = require("./user.interface");
 const user_model_1 = require("./user.model");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+// const mapRoleToWalletType = (role: Role): IType => {
+//   switch (role) {
+//     case Role.USER:
+//       return IType.USER;
+//     case Role.AGENT:
+//       return IType.AGENT;
+//     default:
+//       throw new Error("Invalid role for wallet type");
+//   }
+// };
+// const userCreate = async (payload: IUser) => {
+//   const isExist = await User.findOne({ email: payload.email });
+//   if (isExist) {
+//     throw new Error("User already exist");
+//   }
+//   const hashedPassword = await bcryptjs.hash(payload.password, 10);
+//   const user = await User.create({
+//     name: payload.name,
+//     email: payload.email,
+//     password: hashedPassword,
+//     profilePhoto: payload.profilePhoto,
+//     phone: payload.phone,
+//     role: payload.role,
+//     ...(payload.role === "AGENT" && { userStatus: UserStatus.PENDING }),
+//     ...(payload.role === "USER" && { userStatus: UserStatus.ACTIVE }),
+//   });
+//   await WalletService.walletCreate({
+//     userId: user._id,
+//     balance:50,
+//     walletType: mapRoleToWalletType(payload.role),
+//     walletStatus: Wallet_Status.ACTIVE,
+//   }, user._id.toString());
+//   return user;
+// };
 const mapRoleToWalletType = (role) => {
     switch (role) {
         case user_interface_1.Role.USER:
             return wallet_interface_1.IType.USER;
         case user_interface_1.Role.AGENT:
             return wallet_interface_1.IType.AGENT;
+        case user_interface_1.Role.ADMIN:
+            return wallet_interface_1.IType.ADMIN;
         default:
             throw new Error("Invalid role for wallet type");
     }
@@ -34,14 +71,24 @@ const userCreate = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         throw new Error("User already exist");
     }
     const hashedPassword = yield bcryptjs_1.default.hash(payload.password, 10);
-    const user = yield user_model_1.User.create(Object.assign(Object.assign({ email: payload.email, password: hashedPassword, role: payload.role }, (payload.role === "AGENT" && { userStatus: user_interface_1.UserStatus.PENDING })), (payload.role === "USER" && { userStatus: user_interface_1.UserStatus.ACTIVE })));
-    // Auto-create wallet with initial balance (e.g., 50)
-    yield wallet_service_1.WalletService.walletCreate({
-        userId: user._id,
-        balance: 50, // initial balance
-        walletType: mapRoleToWalletType(payload.role), // or "USER"/"AGENT" accordingly
-        walletStatus: wallet_interface_1.Wallet_Status.ACTIVE,
-    }, user._id.toString());
+    const user = yield user_model_1.User.create({
+        name: payload.name,
+        email: payload.email,
+        password: hashedPassword,
+        profilePhoto: payload.profilePhoto,
+        phone: payload.phone,
+        role: payload.role,
+        userStatus: payload.role === user_interface_1.Role.AGENT ? user_interface_1.UserStatus.PENDING : user_interface_1.UserStatus.ACTIVE,
+    });
+    // ✅ Check if Admin Wallet Already Exists
+    const adminHasWallet = yield wallet_model_1.Wallet.findOne({
+        walletType: wallet_interface_1.IType.ADMIN,
+    });
+    // ✅ Allow Wallet Creation If:
+    const shouldCreateWallet = payload.role !== user_interface_1.Role.ADMIN || !adminHasWallet;
+    if (shouldCreateWallet) {
+        yield wallet_service_1.WalletService.walletCreate(Object.assign({ userId: user._id, balance: payload.role === user_interface_1.Role.ADMIN ? 0 : 50, walletType: mapRoleToWalletType(payload.role), walletStatus: wallet_interface_1.Wallet_Status.ACTIVE }, (payload.role === user_interface_1.Role.AGENT && { profit: 0 })), user._id.toString());
+    }
     return user;
 });
 const getMe = (userId) => __awaiter(void 0, void 0, void 0, function* () {
@@ -51,6 +98,45 @@ const getMe = (userId) => __awaiter(void 0, void 0, void 0, function* () {
 const findAllUser = () => __awaiter(void 0, void 0, void 0, function* () {
     const findAll = yield user_model_1.User.find({});
     return findAll;
+});
+const userAndAgent = (page, limit) => __awaiter(void 0, void 0, void 0, function* () {
+    const parsedLimit = Number(limit);
+    const parsedPage = Number(page);
+    const skip = (parsedPage - 1) * parsedLimit;
+    // ✅ Only USERs + APPROVED AGENTs
+    const agentUser = yield user_model_1.User.find({
+        $or: [
+            { role: user_interface_1.Role.USER },
+            { role: user_interface_1.Role.AGENT, userStatus: user_interface_1.UserStatus.APPROVED }
+        ]
+    })
+        .skip(skip)
+        .limit(parsedLimit);
+    const total = yield user_model_1.User.countDocuments({
+        $or: [
+            { role: user_interface_1.Role.USER },
+            { role: user_interface_1.Role.AGENT, userStatus: user_interface_1.UserStatus.APPROVED }
+        ]
+    });
+    return {
+        data: agentUser,
+        meta: {
+            total,
+            page: parsedPage,
+            limit: parsedLimit, // ✅ corrected spelling
+            totalPages: Math.ceil(total / parsedLimit)
+        }
+    };
+});
+const userAndAgentById = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const agentUser = yield user_model_1.User.find({
+        role: { $in: [user_interface_1.Role.USER, user_interface_1.Role.AGENT] }
+    });
+    if (!agentUser) {
+        throw new Error("You are not authorized to get this user information");
+    }
+    const getById = yield user_model_1.User.findById(id);
+    return getById;
 });
 const agentApprove = (agentId, payload) => __awaiter(void 0, void 0, void 0, function* () {
     const isAgent = yield user_model_1.User.findById(agentId);
@@ -78,7 +164,6 @@ const updateUser = (payload, userId) => __awaiter(void 0, void 0, void 0, functi
     if (!isUserExist) {
         throw new Error("User not found");
     }
-    // Step 1: সবসময় currentPassword মিলছে কিনা চেক করবে
     const isMatch = yield bcryptjs_1.default.compare(currentPassword, isUserExist.password);
     if (!isMatch) {
         throw new Error("Current password is incorrect, update cancelled!");
@@ -87,7 +172,6 @@ const updateUser = (payload, userId) => __awaiter(void 0, void 0, void 0, functi
     if (newPassword) {
         hashedPassword = yield bcryptjs_1.default.hash(newPassword, 10);
     }
-    // Step 4: updateData বানানো
     const updateData = {};
     if (name)
         updateData.name = name;
@@ -97,11 +181,18 @@ const updateUser = (payload, userId) => __awaiter(void 0, void 0, void 0, functi
     const update = yield user_model_1.User.findByIdAndUpdate(userId, { $set: updateData }, { new: true, runValidators: true });
     return update;
 });
+const finance = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield wallet_model_1.Finance.find();
+    return result;
+});
 exports.UserService = {
     userCreate,
     findAllUser,
+    userAndAgentById,
+    userAndAgent,
     agentApprove,
     getMe,
     updateUser,
-    userStatusChange
+    userStatusChange,
+    finance
 };

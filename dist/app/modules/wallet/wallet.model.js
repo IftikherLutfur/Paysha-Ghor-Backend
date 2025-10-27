@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Transaction = exports.Wallet = void 0;
+exports.Transaction = exports.Finance = exports.Wallet = void 0;
 const mongoose_1 = require("mongoose");
 const wallet_interface_1 = require("./wallet.interface");
 const walletSchema = new mongoose_1.Schema({
@@ -22,5 +22,14 @@ const transactionSchema = new mongoose_1.Schema({
     timestamps: true,
     versionKey: false
 });
+const financeSchema = new mongoose_1.Schema({
+    sendMoney: { type: Number },
+    cashOut: { type: Number },
+    profit: { type: Number }
+}, {
+    timestamps: true,
+    versionKey: false
+});
 exports.Wallet = (0, mongoose_1.model)("Wallet", walletSchema);
+exports.Finance = (0, mongoose_1.model)("Finance", financeSchema);
 exports.Transaction = (0, mongoose_1.model)("Transaction", transactionSchema);

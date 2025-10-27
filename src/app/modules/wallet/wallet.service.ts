@@ -224,6 +224,7 @@ const cashInMoney = async (payload: Partial<ITransaction>, userId: string) => {
     const transaction = await Transaction.create({
         to: to,
         amount,
+        from: userId,
         type: IPaymentType.AGENT_CASHIN,
         initiate: userId,
     });
@@ -233,59 +234,61 @@ const cashInMoney = async (payload: Partial<ITransaction>, userId: string) => {
 
 
 const cashoutMoney = async (payload: Partial<ITransaction>, user: any) => {
-  const { amount, to } = payload;
+    const { amount, to } = payload;
 
-  const admin = await Wallet.findOne({walletType: IType.ADMIN})
-  const sender = await Wallet.findOne({ userId: user.userId });
-  const agent = await Wallet.findOne({ userId: to });
+    const admin = await Wallet.findOne({ walletType: IType.ADMIN })
+    const sender = await Wallet.findOne({ userId: user.userId });
+    const agent = await Wallet.findOne({ userId: to });
 
-  if (!sender) throw new Error("Sender not found");
-  if (!agent) throw new Error("Agent not found");
-  if (!admin) throw new Error("Agent not found");
+    if (!sender) throw new Error("Sender not found");
+    if (!agent) throw new Error("Agent not found");
+    if (!admin) throw new Error("Agent not found");
 
-  if (sender.walletStatus === Wallet_Status.BLOCK) {
-    throw new Error("Sender wallet is blocked");
-  }
+    if (sender.walletStatus === Wallet_Status.BLOCK) {
+        throw new Error("Sender wallet is blocked");
+    }
 
-  if (agent.walletStatus === Wallet_Status.BLOCK) {
-    throw new Error("Agent wallet is blocked");
-  }
+    if (agent.walletStatus === Wallet_Status.BLOCK) {
+        throw new Error("Agent wallet is blocked");
+    }
 
-  if (typeof amount !== "number" || isNaN(amount) || amount <= 0) {
-    throw new Error("Amount should be a valid positive number");
-  }
+    if (typeof amount !== "number" || isNaN(amount) || amount <= 0) {
+        throw new Error("Amount should be a valid positive number");
+    }
 
-  const userFee = amount + (amount * 10) / 1000; // 10% fee
-  const agentCommission = (amount * 7) / 1000;   // 7% for agent
-  const adminCommission = (amount * 3) / 1000;   // 3% for admin
-  console.log(adminCommission)
 
-  if (sender.balance < userFee) {
-    throw new Error("Insufficient balance");
-  }
+    const userFee = amount + (amount * 10) / 1000; // 10% fee
+    const agentCommission = (amount * 7) / 1000;   // 7% for agent
+    const adminCommission = (amount * 3) / 1000;   // 3% for admin
+    console.log(adminCommission)
 
-  // Update balances
-  sender.balance -= userFee;
-  agent.balance += agentCommission;
-  admin.balance = admin?.balance + adminCommission
+    if (sender.balance < userFee) {
+        throw new Error("Insufficient balance");
+    }
 
-  await sender.save();
-  await agent.save();
-  await admin.save();
+    // Update balances
+    sender.balance -= userFee;
+    agent.balance += amount;
+    agent.profit = (agent.profit ?? 0) + agentCommission;
+    admin.balance = admin?.balance + adminCommission
 
-  // Save admin profit
-  
+    await sender.save();
+    await agent.save();
+    await admin.save();
 
-  // Save transaction record
-  const createTransaction = await Transaction.create({
-    from: sender.userId,
-    to: to,
-    amount,
-    type: IPaymentType.AGENT_CASHOUT,
-    initiate: user.userEmail,
-  });
+    // Save admin profit
 
-  return createTransaction;
+
+    // Save transaction record
+    const createTransaction = await Transaction.create({
+        from: sender.userId,
+        to: to,
+        amount,
+        type: IPaymentType.AGENT_CASHOUT,
+        initiate: user.userEmail,
+    });
+
+    return createTransaction;
 };
 
 const getAllTransaction = async () => {

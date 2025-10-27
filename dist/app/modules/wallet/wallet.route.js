@@ -13,7 +13,7 @@ wallet.post("/deposite", (0, auth_1.checkAuth)(user_interface_1.Role.USER), (0, 
 wallet.post("/sendMoney", (0, auth_1.checkAuth)(user_interface_1.Role.USER), (0, zodValidation_1.zodValidation)(wallet_validation_1.transactionValidation), wallet_controller_1.WalletController.sendMoney);
 wallet.post("/withdraw", (0, auth_1.checkAuth)(user_interface_1.Role.USER), (0, zodValidation_1.zodValidation)(wallet_validation_1.transactionValidation), wallet_controller_1.WalletController.withdraw);
 wallet.post("/cash-in", (0, auth_1.checkAuth)(user_interface_1.Role.AGENT), (0, zodValidation_1.zodValidation)(wallet_validation_1.transactionValidation), wallet_controller_1.WalletController.cashIn);
-wallet.post("/cash-out", (0, auth_1.checkAuth)(user_interface_1.Role.AGENT), (0, zodValidation_1.zodValidation)(wallet_validation_1.transactionValidation), wallet_controller_1.WalletController.cashout);
+wallet.post("/cash-out", (0, auth_1.checkAuth)(user_interface_1.Role.USER), (0, zodValidation_1.zodValidation)(wallet_validation_1.transactionValidation), wallet_controller_1.WalletController.cashout);
 wallet.get("/transaction", (0, auth_1.checkAuth)(user_interface_1.Role.ADMIN), wallet_controller_1.WalletController.getAllTransaction);
 wallet.get("/:id", (0, auth_1.checkAuth)(user_interface_1.Role.AGENT, user_interface_1.Role.USER), wallet_controller_1.WalletController.getIndividualWallet);
 wallet.get("/transaction/:id", (0, auth_1.checkAuth)(user_interface_1.Role.AGENT, user_interface_1.Role.USER), wallet_controller_1.WalletController.getIndividualTransaction);

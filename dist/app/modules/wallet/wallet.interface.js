@@ -5,6 +5,7 @@ var IType;
 (function (IType) {
     IType["USER"] = "USER";
     IType["AGENT"] = "AGENT";
+    IType["ADMIN"] = "ADMIN";
 })(IType || (exports.IType = IType = {}));
 var Wallet_Status;
 (function (Wallet_Status) {

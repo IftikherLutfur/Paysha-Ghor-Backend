@@ -1,14 +1,14 @@
 import { Types } from "mongoose";
 
 export enum IType {
-    USER="USER",
-    AGENT="AGENT",
-    ADMIN="ADMIN"
+    USER = "USER",
+    AGENT = "AGENT",
+    ADMIN = "ADMIN"
 }
 
-export enum Wallet_Status{
-    ACTIVE="ACTIVE",
-    BLOCK= "BLOCK"
+export enum Wallet_Status {
+    ACTIVE = "ACTIVE",
+    BLOCK = "BLOCK"
 }
 
 export interface IWallet {
@@ -16,8 +16,9 @@ export interface IWallet {
     userId: Types.ObjectId;
     balance: number;
     walletStatus: Wallet_Status;
-    walletType?:IType;
+    walletType?: IType;
     commissionEarned?: number;
+    profit?: number;
 }
 
 export enum IPaymentType {
@@ -32,13 +33,13 @@ export interface ITransaction {
     _id?: Types.ObjectId;
     from?: Types.ObjectId;
     to?: Types.ObjectId;
-    amount?:number;
-    type?:IPaymentType;
+    amount?: number;
+    type?: IPaymentType;
     initiate?: Types.ObjectId;
 }
 
-export interface IFinance{
-    sendMoney?:number;
+export interface IFinance {
+    sendMoney?: number;
     cashOut?: number;
     profit?: number;
 }

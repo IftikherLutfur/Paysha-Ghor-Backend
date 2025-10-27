@@ -9,7 +9,7 @@ const userSchema = new Schema<IUser>({
     password: { type: String, required: true },
     profilePhoto: { type: String, required: true },
     phone: { type: String, required: true, unique: true },
-    role: { type: String, enum: Object.values(Role), default: Role.USER },
+    role: { type: String },
     userStatus: { type: String, enum: Object.values(UserStatus) },
 },
     {

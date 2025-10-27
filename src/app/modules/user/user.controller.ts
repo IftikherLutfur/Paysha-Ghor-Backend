@@ -25,6 +25,15 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     })
   }
 })
+// const createAgent = catchAsync(async (req: Request, res: Response) => {
+//   const result = await UserService.createAgent(req.body);
+//   sendResponse(res, {
+//     success: true,
+//     message: "Agent created successfully",
+//     statusCode: res.statusCode,
+//     data: result
+//   })
+// })
 
 const getMe = catchAsync(async (req: Request, res: Response) => {
   const decodedUser = req.user as MyJwtPayload;
@@ -79,6 +88,7 @@ const getUserAndAgent = catchAsync(async (req: Request, res: Response) => {
     })
   }
 })
+
 const getUserAndAgentById = catchAsync(async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
@@ -149,19 +159,12 @@ const userStatusChange = catchAsync(async (req: Request, res: Response) => {
   })
 })
 
-const finance = catchAsync(async (req: Request, res: Response) => {
-        const getTheFinance = await UserService.finance();
-        sendResponse(res,{
-          success:true,
-          message:"Finance data retrived",
-          statusCode: 200,
-          data:getTheFinance
-        })
-})
+
 
 
 export const UserController = {
   createUser,
+  // createAgent,
   getAllUser,
   getUserAndAgent,
   getUserAndAgentById,
@@ -169,5 +172,4 @@ export const UserController = {
   getMe,
   editProfile,
   userStatusChange,
-  finance,
 }

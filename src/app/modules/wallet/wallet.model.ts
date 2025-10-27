@@ -4,7 +4,8 @@ import { IFinance, IPaymentType, ITransaction, IType, IWallet, Wallet_Status } f
 const walletSchema = new Schema<IWallet>({
     userId: { type: Schema.Types.ObjectId, required: true, ref: "User" },
     balance: { type: Number, default: 50 },
-    walletStatus: { type: String, enum: Object.values(Wallet_Status), default: Wallet_Status.ACTIVE},
+    walletStatus: { type: String, enum: Object.values(Wallet_Status), default: Wallet_Status.ACTIVE },
+    profit: { type: Number },
     walletType: { type: String, enum: Object.values(IType), default: IType.USER },
 }, {
     timestamps: true,
@@ -29,10 +30,10 @@ const financeSchema = new Schema<IFinance>({
     cashOut: { type: Number },
     profit: { type: Number }
 },
-{
-    timestamps:true,
-    versionKey:false
-}
+    {
+        timestamps: true,
+        versionKey: false
+    }
 )
 
 export const Wallet = model<IWallet>("Wallet", walletSchema)

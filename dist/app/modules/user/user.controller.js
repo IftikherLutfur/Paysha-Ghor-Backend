@@ -20,8 +20,8 @@ const createUser = (0, catchAsymc_1.catchAsync)((req, res, next) => __awaiter(vo
         (0, sendResponse_1.sendResponse)(res, {
             success: true,
             message: "User created successfully",
-            data: user,
             statusCode: res.statusCode,
+            data: user,
         });
     }
     catch (error) {
@@ -35,7 +35,6 @@ const createUser = (0, catchAsymc_1.catchAsync)((req, res, next) => __awaiter(vo
 }));
 const getMe = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const decodedUser = req.user;
-    
     const getMyAccount = yield user_service_1.UserService.getMe(decodedUser.userId);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
@@ -51,6 +50,48 @@ const getAllUser = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, 
             success: true,
             message: "All users retrieved successfully",
             data: findAllUser,
+            statusCode: res.statusCode,
+        });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).json({
+            success: false,
+            message: "Something went wrong",
+            error
+        });
+    }
+}));
+const getUserAndAgent = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 10;
+        const findUser = yield user_service_1.UserService.userAndAgent(page, limit);
+        (0, sendResponse_1.sendResponse)(res, {
+            success: true,
+            message: "All users or agent data retrived",
+            meta: findUser.meta,
+            data: findUser.data,
+            statusCode: res.statusCode,
+        });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(400).json({
+            success: false,
+            message: "Something went wrong",
+            error
+        });
+    }
+}));
+const getUserAndAgentById = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const id = req.params.id;
+        const findUser = yield user_service_1.UserService.userAndAgentById(id);
+        (0, sendResponse_1.sendResponse)(res, {
+            success: true,
+            message: "All users or agent data retrived",
+            data: findUser,
             statusCode: res.statusCode,
         });
     }
@@ -107,11 +148,23 @@ const userStatusChange = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(vo
         statusCode: res.statusCode,
     });
 }));
+const finance = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const getTheFinance = yield user_service_1.UserService.finance();
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        message: "Finance data retrived",
+        statusCode: 200,
+        data: getTheFinance
+    });
+}));
 exports.UserController = {
     createUser,
     getAllUser,
+    getUserAndAgent,
+    getUserAndAgentById,
     agentApprove,
     getMe,
     editProfile,
-    userStatusChange
+    userStatusChange,
+    finance,
 };
