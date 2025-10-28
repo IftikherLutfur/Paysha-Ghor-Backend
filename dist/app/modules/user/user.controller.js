@@ -33,6 +33,15 @@ const createUser = (0, catchAsymc_1.catchAsync)((req, res, next) => __awaiter(vo
         });
     }
 }));
+// const createAgent = catchAsync(async (req: Request, res: Response) => {
+//   const result = await UserService.createAgent(req.body);
+//   sendResponse(res, {
+//     success: true,
+//     message: "Agent created successfully",
+//     statusCode: res.statusCode,
+//     data: result
+//   })
+// })
 const getMe = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const decodedUser = req.user;
     const getMyAccount = yield user_service_1.UserService.getMe(decodedUser.userId);
@@ -148,17 +157,9 @@ const userStatusChange = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(vo
         statusCode: res.statusCode,
     });
 }));
-const finance = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const getTheFinance = yield user_service_1.UserService.finance();
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        message: "Finance data retrived",
-        statusCode: 200,
-        data: getTheFinance
-    });
-}));
 exports.UserController = {
     createUser,
+    // createAgent,
     getAllUser,
     getUserAndAgent,
     getUserAndAgentById,
@@ -166,5 +167,4 @@ exports.UserController = {
     getMe,
     editProfile,
     userStatusChange,
-    finance,
 };

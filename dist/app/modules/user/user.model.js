@@ -9,7 +9,7 @@ const userSchema = new mongoose_1.Schema({
     password: { type: String, required: true },
     profilePhoto: { type: String, required: true },
     phone: { type: String, required: true, unique: true },
-    role: { type: String, enum: Object.values(user_interface_1.Role), default: user_interface_1.Role.USER },
+    role: { type: String },
     userStatus: { type: String, enum: Object.values(user_interface_1.UserStatus) },
 }, {
     timestamps: true,

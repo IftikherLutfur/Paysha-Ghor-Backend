@@ -19,4 +19,5 @@ var IPaymentType;
     IPaymentType["WITHDRAW"] = "WITHDRAW";
     IPaymentType["AGENT_CASHIN"] = "AGENT_CASHIN";
     IPaymentType["AGENT_CASHOUT"] = "AGENT_CASHOUT";
+    IPaymentType["MOBILE_RECHARGE"] = "MOBILE_RECHARGE";
 })(IPaymentType || (exports.IPaymentType = IPaymentType = {}));

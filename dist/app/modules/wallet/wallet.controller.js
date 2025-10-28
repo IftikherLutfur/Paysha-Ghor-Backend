@@ -67,6 +67,17 @@ const cashIn = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void
         statusCode: res.statusCode
     });
 }));
+const agentMobileRecharge = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const userId = req.user;
+    const body = req.body;
+    const result = yield wallet_service_1.WalletService.mobileRecharge(body, userId);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        message: "Recharge Successful",
+        statusCode: res.statusCode,
+        data: result
+    });
+}));
 const cashout = (0, catchAsymc_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const payload = req.body;
@@ -154,5 +165,6 @@ exports.WalletController = {
     getAllTransaction,
     getIndividualWallet,
     getIndividualTransaction,
-    changeWalletStatus
+    changeWalletStatus,
+    agentMobileRecharge
 };

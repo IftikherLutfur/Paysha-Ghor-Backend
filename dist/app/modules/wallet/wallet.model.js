@@ -7,6 +7,7 @@ const walletSchema = new mongoose_1.Schema({
     userId: { type: mongoose_1.Schema.Types.ObjectId, required: true, ref: "User" },
     balance: { type: Number, default: 50 },
     walletStatus: { type: String, enum: Object.values(wallet_interface_1.Wallet_Status), default: wallet_interface_1.Wallet_Status.ACTIVE },
+    profit: { type: Number },
     walletType: { type: String, enum: Object.values(wallet_interface_1.IType), default: wallet_interface_1.IType.USER },
 }, {
     timestamps: true,
@@ -18,6 +19,7 @@ const transactionSchema = new mongoose_1.Schema({
     amount: { type: Number, required: true },
     type: { type: String, enum: Object.values(wallet_interface_1.IPaymentType), required: true },
     initiate: { type: mongoose_1.Schema.Types.ObjectId },
+    number: { type: Number },
 }, {
     timestamps: true,
     versionKey: false

@@ -58,6 +58,7 @@ const deposite = (userId, amount) => __awaiter(void 0, void 0, void 0, function*
     const deposite = yield wallet_model_1.Transaction.create({
         type: wallet_interface_1.IPaymentType.POPUP,
         from: userId,
+        initiate: userId,
         amount: amount
     });
     return deposite;
@@ -195,6 +196,7 @@ const cashInMoney = (payload, userId) => __awaiter(void 0, void 0, void 0, funct
     return transaction;
 });
 const cashoutMoney = (payload, user) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const { amount, to } = payload;
     const admin = yield wallet_model_1.Wallet.findOne({ walletType: wallet_interface_1.IType.ADMIN });
     const sender = yield wallet_model_1.Wallet.findOne({ userId: user.userId });
@@ -223,7 +225,8 @@ const cashoutMoney = (payload, user) => __awaiter(void 0, void 0, void 0, functi
     }
     // Update balances
     sender.balance -= userFee;
-    agent.balance += agentCommission;
+    agent.balance += amount;
+    agent.profit = ((_a = agent.profit) !== null && _a !== void 0 ? _a : 0) + agentCommission;
     admin.balance = (admin === null || admin === void 0 ? void 0 : admin.balance) + adminCommission;
     yield sender.save();
     yield agent.save();
@@ -235,7 +238,24 @@ const cashoutMoney = (payload, user) => __awaiter(void 0, void 0, void 0, functi
         to: to,
         amount,
         type: wallet_interface_1.IPaymentType.AGENT_CASHOUT,
-        initiate: user.userEmail,
+        initiate: user.userId,
+    });
+    return createTransaction;
+});
+const mobileRecharge = (payload, user) => __awaiter(void 0, void 0, void 0, function* () {
+    const { amount } = payload;
+    const sender = yield wallet_model_1.Wallet.findOne({ userId: user.userId });
+    if (!sender) {
+        throw new Error("Sender is required");
+    }
+    sender.balance -= Number(amount);
+    yield sender.save();
+    const createTransaction = yield wallet_model_1.Transaction.create({
+        from: sender === null || sender === void 0 ? void 0 : sender.userId,
+        number: payload.number,
+        amount: amount,
+        type: wallet_interface_1.IPaymentType.MOBILE_RECHARGE,
+        initiate: user.userId,
     });
     return createTransaction;
 });
@@ -274,5 +294,6 @@ exports.WalletService = {
     getAllTransaction,
     getIndividualWallet,
     getOwnTransaction,
-    changeWalletStatus
+    changeWalletStatus,
+    mobileRecharge
 };
