@@ -5,16 +5,16 @@ import { catchAsync } from "../../utils/catchAsymc";
 import { MyJwtPayload } from "../../utils/jwt";
 
 
-const getAllWallet = catchAsync(async(req:Request, res:Response)=>{
-    const {userId} = req.user as MyJwtPayload
-   const wallets = await WalletService.allWallets(userId)
-   sendResponse(res,{
-    success: true,
-    message:"All wallets retrived",
-    statusCode: res.statusCode,
-    data: wallets
-    
-   })
+const getAllWallet = catchAsync(async (req: Request, res: Response) => {
+    const { userId } = req.user as MyJwtPayload
+    const wallets = await WalletService.allWallets(userId)
+    sendResponse(res, {
+        success: true,
+        message: "All wallets retrived",
+        statusCode: res.statusCode,
+        data: wallets
+
+    })
 })
 
 // pop-up
@@ -42,6 +42,7 @@ const depositeByUser = catchAsync(async (req: Request, res: Response) => {
     }
 }
 )
+
 const sendMoney = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
     const userId = req.user as MyJwtPayload;
@@ -56,34 +57,46 @@ const sendMoney = catchAsync(async (req: Request, res: Response) => {
 
 // cashin by agent
 const cashIn = catchAsync(async (req: Request, res: Response) => {
-  const payload = req.body;
-  const userId = req.user as MyJwtPayload;
-  const result = await WalletService.cashInMoney(payload, userId.userId);
+    const payload = req.body;
+    const userId = req.user as MyJwtPayload;
+    const result = await WalletService.cashInMoney(payload, userId.userId);
 
-  sendResponse(res, {
-    success: true,
-    message: "Cashin Successful",
-    data: result,
-    statusCode: res.statusCode
-  });
+    sendResponse(res, {
+        success: true,
+        message: "Cashin Successful",
+        data: result,
+        statusCode: res.statusCode
+    });
 });
+
+const agentMobileRecharge = catchAsync(async (req: Request, res: Response) => {
+    const userId = req.user as MyJwtPayload;
+    const body = req.body;
+    const result = await WalletService.mobileRecharge(body, userId);
+    sendResponse(res, {
+        success: true,
+        message: "Recharge Successful",
+        statusCode: res.statusCode,
+        data: result
+    })
+})
 
 
 
 const cashout = catchAsync(async (req: Request, res: Response) => {
-   try {
-     const payload = req.body;
-    const userId = req.user as MyJwtPayload
-    const cashInByAgent = await WalletService.cashoutMoney(payload, userId);
-    sendResponse(res, {
-        success: true,
-        message: "Cashout Successful",
-        statusCode: res.statusCode,
-        data: cashInByAgent
-    })
-   } catch (error) {
-       console.log(error)
-   }
+    try {
+        const payload = req.body;
+        const userId = req.user as MyJwtPayload
+        const cashInByAgent = await WalletService.cashoutMoney(payload, userId);
+        sendResponse(res, {
+            success: true,
+            message: "Cashout Successful",
+            statusCode: res.statusCode,
+            data: cashInByAgent
+        })
+    } catch (error) {
+        console.log(error)
+    }
 })
 
 const withdraw = catchAsync(async (req: Request, res: Response) => {
@@ -166,5 +179,6 @@ export const WalletController = {
     getAllTransaction,
     getIndividualWallet,
     getIndividualTransaction,
-    changeWalletStatus
+    changeWalletStatus,
+    agentMobileRecharge
 };

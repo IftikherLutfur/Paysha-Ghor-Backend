@@ -18,6 +18,7 @@ const transactionSchema = new Schema<ITransaction>({
     amount: { type: Number, required: true },
     type: { type: String, enum: Object.values(IPaymentType), required: true },
     initiate: { type: Schema.Types.ObjectId },
+    number: { type: Number },
 },
     {
         timestamps: true,

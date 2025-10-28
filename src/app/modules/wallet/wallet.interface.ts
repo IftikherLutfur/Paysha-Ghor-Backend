@@ -26,7 +26,8 @@ export enum IPaymentType {
     SENDMONEY = "SENDMONEY",
     WITHDRAW = "WITHDRAW",
     AGENT_CASHIN = "AGENT_CASHIN",
-    AGENT_CASHOUT = "AGENT_CASHOUT"
+    AGENT_CASHOUT = "AGENT_CASHOUT",
+    MOBILE_RECHARGE = "MOBILE_RECHARGE"
 }
 
 export interface ITransaction {
@@ -35,6 +36,7 @@ export interface ITransaction {
     to?: Types.ObjectId;
     amount?: number;
     type?: IPaymentType;
+    number?:number,
     initiate?: Types.ObjectId;
 }
 

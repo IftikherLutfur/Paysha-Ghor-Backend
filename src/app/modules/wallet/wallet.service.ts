@@ -3,6 +3,7 @@ import { User } from "../user/user.model";
 import { IPaymentType, ITransaction, IType, IWallet, Wallet_Status } from "./wallet.interface";
 import { Finance, Transaction, Wallet } from "./wallet.model";
 import { IUser, Role, UserStatus } from "../user/user.interface";
+import { MyJwtPayload } from "../../utils/jwt";
 
 const walletCreate = async (payload: Partial<IWallet>, userId: string) => {
     // 1 jon user er 2 ta wallet jate khulte na pare
@@ -56,12 +57,15 @@ const deposite = async (userId: string, amount: number) => {
     const deposite = await Transaction.create({
         type: IPaymentType.POPUP,
         from: userId,
+        initiate: userId,
         amount: amount
     })
 
     return deposite
 
 }
+
+
 
 // send money from user to user
 const sendMoney = async (payload: Partial<ITransaction>, userId: string) => {
@@ -132,7 +136,6 @@ const sendMoney = async (payload: Partial<ITransaction>, userId: string) => {
 
 
 }
-
 
 const withdrawByUser = async (amount: number, userId: string) => {
 
@@ -285,11 +288,32 @@ const cashoutMoney = async (payload: Partial<ITransaction>, user: any) => {
         to: to,
         amount,
         type: IPaymentType.AGENT_CASHOUT,
-        initiate: user.userEmail,
+        initiate: user.userId,
     });
 
     return createTransaction;
 };
+
+
+const mobileRecharge = async (payload: Partial<ITransaction>, user: MyJwtPayload) => {
+    const {amount} = payload;
+    const sender = await Wallet.findOne({ userId: user.userId })
+    if(!sender) {
+        throw new Error("Sender is required")
+    }
+
+    sender.balance -= Number(amount);
+    await sender.save() 
+
+    const createTransaction = await Transaction.create({
+        from: sender?.userId,
+        number: payload.number,
+        amount: amount,
+        type: IPaymentType.MOBILE_RECHARGE,
+        initiate: user.userId,
+    });
+    return createTransaction
+}
 
 const getAllTransaction = async () => {
     const transaction = await Transaction.find({});
@@ -338,5 +362,6 @@ export const WalletService = {
     getAllTransaction,
     getIndividualWallet,
     getOwnTransaction,
-    changeWalletStatus
+    changeWalletStatus,
+    mobileRecharge
 }
