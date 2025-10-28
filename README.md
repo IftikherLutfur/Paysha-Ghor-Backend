@@ -1,128 +1,84 @@
-# 💸 Paysha Ghor - Digital Wallet API (Backend)
+# 💸 PoyshaGhor – A Digital Wallet & Smart Financial Solution
 
-A role-based digital wallet backend built with **Node.js**, **Express.js**, and **MongoDB**. This API supports `User`, `Agent`, and `Admin` roles with secure JWT authentication, transaction management, and modular structure.
-
----
-
-## 🚀 Features
-
-- ✅ Role-based JWT Authentication  
-- ✅ Secure Password Hashing with **bcrypt**  
-- ✅ Auto Wallet Creation with ৳50 Initial Balance  
-- ✅ Deposit, Send, Withdraw, Cash-in, and Cash-out Features  
-- ✅ Admin Panel for User & Wallet Management  
-- ✅ Modular MVC Project Structure
+PoyshaGhor is a secure and user-friendly digital wallet system where users can send money, cash out using agents, recharge mobile numbers, and manage finances efficiently. The platform defines **three role-based dashboards**: Admin, Agent, and User — each with dedicated functionalities.
 
 ---
 
-## 👥 User Roles and Permissions
+## 👥 User Roles & Access
 
-| Role     | Permissions                                                                 |
-|----------|------------------------------------------------------------------------------|
-| 👤 **User**   | Deposit, Send money, Withdraw, View own wallet & transactions             |
-| 🧑‍💼 **Agent**  | Cash-in to user, Cash-out from user, View own wallet                     |
-| 🛡️ **Admin**   | View all users/agents/wallets/transactions, Approve/Suspend/Block users  |
+### 🔹 Admin  
+- ✅ Approve newly registered Agents  
+- ✅ Manage Users & Agents  
+- ✅ View all transactions in the system  
+
+📌 Credentials  
+> Email: **admin@gmail.com**  
+> Password: **Abdullah677#$%**
 
 ---
 
-## 🔐 Authentication & Authorization
+### 🔹 Agent  
+- ✅ Cash-in money to any User  
+- ✅ Mobile Recharge to any valid 11-digit number  
 
-All routes are protected with JWT and role-based middleware.
+📌 Credentials  
+> Email: **agent6@gmail.com**  
+> Password: **Abdullah677#$%**
 
-📦 API Endpoints
-🟢 Base URL: https://poysha-ghor.vercel.app
+---
 
-**Admin Loginn**
-`{ "email":"admin@gmail.com",
-    "password": "Abcd@1234"  }`
-    
-**Agent Login**
-`{
-   "email":"abdullah@gmail.com",
-    "password": "1234Abdullah$$%%"  
-}`
+### 🔹 User  
+- ✅ Send Money to other users  
+- ✅ Cash-out through an Agent  
+- ✅ Add Money to wallet (Self Deposit)
 
-## 👤 User Routes
+📌 Credentials  
+> Email: **usert@gmail.com**  
+> Password: **Abdullah677#$%**
 
-**POST /api/user — Register a new user**
+---
 
-`{
-  "email": "test@gmail.com",
-  "password": "Abcd@1234",
-  "role": "USER" | "AGENT"}`
+## 🔐 Security Rules
 
-**GET /api/user — Get all users (Admin only)**
+✅ Password must contain:  
+- 1 Capital Letter  
+- 1 Small Letter  
+- 1 Number  
+- 1 Special Character  
+- Minimum 6 Characters  
+> Example: `Random66#$%`
 
-**PATCH /api/user/agent-approve/:userId — Approve/Suspend an agent**
+✅ Profile Photo – direct URL upload (Cloud Upload feature coming soon)
 
-`{ "userStatus": "PENDING"(By default) | "APPROVED" | "SUSPEND"}`
+---
 
-### 🔑 Auth Routes
+## 🛠️ Tech Stack
 
-**POST /api/auth/login` — Login**  
- 
- `{"email": "iftikher@gmail.com",
-    "password": "1234Abdullah$$%%"}`
-**POST /api/auth/logout — Logout**
+| Category | Technologies |
+|---------|--------------|
+| Frontend | React.js, Tailwind CSS |
+| Backend | Node.js, Express.js |
+| Database | MongoDB |
+| Authentication | Firebase / JWT |
+| State Management | Redux |
+| Tools | Cloudinary (upcoming uploader) |
 
-## 💳 Wallet Routes
+---
 
-**GET /api/wallet/:userId — Get individually wallet by user ID**
+## 🚀 Upcoming Features
 
-**GET /api/wallet — Get all wallet only for admin**
+- ✏️ Edit Profile  
+- 💳 Bill Payment  
+- 🧾 Government Fee Payment  
+- 🎓 Education Fee Payment  
+- 🌐 Online Payment System  
 
-**POST /api/wallet/deposite — Deposit money (by user)**
+---
 
-`{"from": "userId","amount": 20}`
-
-**POST /api/wallet/sendMoney — Send money (user to user)**
-
-`{"to": "receiverUserId","amount": 150}`
-
-**POST /api/wallet/withdraw — Withdraw money (user)**
-
-`{"amount": 1000}`
-
-**POST /api/wallet/cash-in — Agent adds money to user**
-
-`{"to": "userId", "amount": 150}`
-
-**POST /api/wallet/cash-out — Agent withdraws from user**
-
-`{"from": "userId","amount": 200}`
-
-**PATCH /api/wallet/:walletId**
-`{
-    "walletStatus": "BLOCK"
-}`
-
-📄 Transaction Routes
-
--**GET /api/wallet/transaction — Get all transactions (Admin only)**
-
--**GET /api/wallet/transaction/:userId — Get transactions for specific user**
+## 📜 License
+This project is proprietary.  
+All rights reserved © 2025 — **Iftikher Lutfur Abdullah**  
+Unauthorized use, distribution, or modification is strictly prohibited.
 
 
-
-⚙️ Technologies Used
-🟨 Node.js
-
-⚙️ Express.js
-
-🍃 MongoDB + Mongoose
-
-🔒 bcrypt for hashing passwords
-
-🛡️ JWT for authentication
-
-🧠 Role-based middleware
-
-🛠️ Project Setup
-
-
-🧠 Author
-**Iftikher Lutfur Abdullah**
-
--**🧑‍💻 Junior Full Stack Developer**
-
-**📧 iftikherlutfur@gmail.com**
+---
